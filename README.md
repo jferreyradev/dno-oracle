@@ -368,6 +368,8 @@ const result = await exec(
 - [x] Scripts de diagnóstico
 - [x] Documentación completa
 - [x] Estructura de proyecto organizada
+- [x] API REST completa
+- [x] Scripts multiplataforma (Windows/Linux)
 
 ### 🔄 En Desarrollo
 - [ ] Soporte para CLOB/BLOB avanzado
@@ -376,10 +378,12 @@ const result = await exec(
 - [ ] Métricas y monitoring avanzado
 
 ### 📋 Roadmap
-- [ ] Soporte para procedimientos almacenados
 - [ ] ORM simple integrado
 - [ ] Migración automática de esquemas
 - [ ] Dashboard web de administración
+- [ ] Soporte para Oracle Cloud
+- [ ] Plugin para VS Code
+- [ ] Generador de documentación automática
 
 ## 🛠️ Configuración de Desarrollo
 
@@ -416,9 +420,228 @@ Las contribuciones son bienvenidas! Por favor:
 4. Push a la rama
 5. Crear un Pull Request
 
+### 🔀 Gestión de Mejoras y Fusiones
+
+#### Proceso de Contribución
+
+**1. Preparación del Entorno**
+```bash
+# Fork del repositorio en GitHub
+git clone https://github.com/tu-usuario/dno-oracle.git
+cd dno-oracle
+
+# Configurar upstream
+git remote add upstream https://github.com/original-repo/dno-oracle.git
+
+# Instalar dependencias y configurar
+cp .env.example .env
+./run.sh install
+```
+
+**2. Crear una Nueva Feature**
+```bash
+# Crear rama para la nueva funcionalidad
+git checkout -b feature/nueva-funcionalidad
+
+# O para corrección de bugs
+git checkout -b fix/correccion-bug
+
+# O para mejoras de documentación
+git checkout -b docs/mejora-documentacion
+```
+
+**3. Desarrollo y Testing**
+```bash
+# Desarrollar la funcionalidad
+# Ejecutar pruebas antes de commit
+./run.sh test
+./run.sh test:advanced
+
+# Verificar formato y linting
+deno fmt
+deno lint
+
+# Probar la API si es relevante
+./run.sh demo:complete
+```
+
+**4. Commit y Push**
+```bash
+# Commit con mensaje descriptivo
+git add .
+git commit -m "feat: agregar soporte para [funcionalidad]"
+
+# O para fixes
+git commit -m "fix: corregir problema con [descripción]"
+
+# Push a tu fork
+git push origin feature/nueva-funcionalidad
+```
+
+**5. Pull Request**
+- Crear PR desde GitHub
+- Describir claramente los cambios
+- Incluir tests si es aplicable
+- Referenciar issues relacionados
+
+#### Tipos de Contribuciones Bienvenidas
+
+**🔧 Mejoras Técnicas**
+- Optimización de performance
+- Mejor manejo de errores
+- Soporte para nuevas versiones de Oracle
+- Mejoras en el pool de conexiones
+
+**📚 Documentación**
+- Ejemplos adicionales
+- Tutoriales paso a paso
+- Traducciones
+- Mejoras en comentarios del código
+
+**🧪 Testing**
+- Casos de prueba adicionales
+- Tests de integración
+- Benchmarks de performance
+- Tests para diferentes versiones Oracle
+
+**🌟 Nuevas Funcionalidades**
+- Soporte para nuevos tipos de datos
+- Herramientas de migración
+- Integración con otros frameworks
+- Utilidades adicionales
+
+#### Guías de Estilo
+
+**Código JavaScript/TypeScript**
+```javascript
+// Usar async/await en lugar de callbacks
+async function queryDatabase() {
+    try {
+        const result = await exec("SELECT * FROM users");
+        return result;
+    } catch (error) {
+        console.error("Database error:", error);
+        throw error;
+    }
+}
+
+// Documentar funciones públicas
+/**
+ * Ejecuta una consulta SQL con parámetros
+ * @param {string} sql - La consulta SQL
+ * @param {object} params - Parámetros de la consulta
+ * @returns {Promise<object>} Resultado de la consulta
+ */
+```
+
+**Commits**
+- Usar conventional commits: `feat:`, `fix:`, `docs:`, etc.
+- Mensajes en español o inglés (consistente)
+- Descripción clara y concisa
+
+**Pull Requests**
+- Título descriptivo
+- Descripción detallada de cambios
+- Lista de cambios importantes
+- Screenshots si es aplicable
+
+#### Configuración de Issues
+
+**🐛 Reportar Bugs**
+```markdown
+## Descripción del Bug
+Descripción clara del problema
+
+## Pasos para Reproducir
+1. Configurar entorno con...
+2. Ejecutar comando...
+3. Ver error...
+
+## Comportamiento Esperado
+Lo que debería pasar
+
+## Comportamiento Actual
+Lo que realmente pasa
+
+## Entorno
+- OS: [Windows/Linux/macOS]
+- Deno version: [1.40.x]
+- Oracle version: [19c/21c]
+- DNO-Oracle version: [x.x.x]
+```
+
+**💡 Solicitar Features**
+```markdown
+## Descripción de la Feature
+¿Qué funcionalidad te gustaría agregar?
+
+## Motivación
+¿Por qué sería útil esta feature?
+
+## Descripción Detallada
+Descripción técnica de la implementación
+
+## Alternativas Consideradas
+¿Hay otras formas de lograr esto?
+```
+
+#### Proceso de Review
+
+**Para Maintainers:**
+1. ✅ Verificar que pasan todos los tests
+2. ✅ Revisar calidad del código
+3. ✅ Verificar documentación actualizada
+4. ✅ Probar funcionalidad manualmente
+5. ✅ Verificar compatibilidad
+
+**Criterios de Aceptación:**
+- Tests pasan sin errores
+- Código sigue guías de estilo
+- Documentación actualizada
+- No rompe funcionalidad existente
+- Mejora la experiencia del usuario
+
+#### Releases y Versionado
+
+**Semantic Versioning (SemVer)**
+- `MAJOR.MINOR.PATCH` (ej: 1.2.3)
+- **MAJOR**: Cambios incompatibles
+- **MINOR**: Nueva funcionalidad compatible
+- **PATCH**: Correcciones de bugs
+
+**Proceso de Release**
+```bash
+# Preparar release
+git checkout main
+git pull upstream main
+
+# Actualizar versión en deno.json
+# Actualizar CHANGELOG.md
+
+# Crear tag
+git tag -a v1.2.3 -m "Release version 1.2.3"
+git push upstream v1.2.3
+```
+
+#### Integración Continua
+
+**GitHub Actions**
+- Tests automáticos en múltiples versiones de Deno
+- Verificación de formato y linting
+- Tests de integración con Oracle
+- Generación automática de documentación
+
+#### Comunicación
+
+**Canales de Comunicación**
+- 📧 Email: jferreyra.dev@gmail.com
+- 🐛 GitHub Issues para bugs y features
+- 💬 Discussions para preguntas generales
+- 📖 Wiki para documentación colaborativa
+
 ## 📞 Soporte
 
-- 📧 **Email**: soporte@proyecto.com
+- 📧 **Email**: jferreyra.dev@gmail.com
 - 🐛 **Issues**: [GitHub Issues](issues)
 - 📖 **Docs**: [Documentación completa](docs/)
 

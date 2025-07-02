@@ -5,7 +5,35 @@
 
 set -e
 
-# Configurar variables de entorno
+# C    "sql")
+        echo "📊 Ejecutando archivo SQL: $2"
+        deno run --allow-net --allow-read --allow-env --allow-ffi scripts/common/sql-executor.js "$2"
+        ;;
+    
+    "setup-logs")
+        echo "📊 Configurando tablas de logs usando la librería DNO-Oracle..."
+        deno run --allow-net --allow-read --allow-env --allow-ffi scripts/common/sql-executor.js scripts/common/create-logs-table.sql
+        ;;
+    
+    "demo-complete")
+        echo "🎬 Demo completo automatizado (DB + API + Tests)..."
+        ./scripts/linux/demo-complete.sh
+        ;;
+    
+    "demo")
+        echo "🎬 Ejecutando demostración básica..."
+        ./scripts/linux/demo-api.sh
+        ;;
+    
+    "diagnose")
+        echo "🔍 Ejecutando diagnóstico del sistema..."
+        ./scripts/linux/diagnose-oracle.sh
+        ;;
+    
+    "fix:dns")
+        echo "🌐 Ejecutando solución de problemas DNS..."
+        ./scripts/linux/fix-dns.sh
+        ;;ables de entorno
 export LD_LIBRARY_PATH=/home/jferreyradev/bin/instantclient_19_25:$LD_LIBRARY_PATH
 
 case "$1" in

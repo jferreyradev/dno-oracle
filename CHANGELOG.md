@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- 🖥️ **Multiplataform Scripts** - Separate Windows (.ps1) and Linux (.sh) scripts
+- 📁 **Organized Structure** - `scripts/windows/`, `scripts/linux/`, `scripts/common/`
+- ✅ **Structure Verification** - Script to verify installation and setup
+- 📝 **Enhanced Documentation** - Detailed contribution guidelines and improvement management
+- 🔧 **SQL Executor Fix** - Corrected import paths for reorganized structure
+- 🌐 **Contribution Workflow** - Complete guide for managing improvements and merges
+
+### Changed
+- 🔄 **Script Organization** - Moved platform-specific scripts to dedicated folders
+- 📍 **Import Paths** - Updated JavaScript import paths for new structure
+- 📖 **README Updates** - Enhanced with contribution guidelines and contact info
+- 🗂️ **Project Structure** - Better organization for maintainability
+
+### Fixed
+- 🐛 **Import Path Errors** - Fixed module import paths in sql-executor.js and test files
+- 📋 **Roadmap Consistency** - Removed duplicate items from project roadmap
+- 🔗 **Script References** - Updated all script references to use new folder structure
+
 ## [1.0.0] - 2024-07-02
 
 ### Added

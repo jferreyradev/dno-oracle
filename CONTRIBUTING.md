@@ -1,13 +1,91 @@
-# Contributing to DNO-Oracle 🤝
+# Guía de Contribución - DNO-Oracle 🤝
 
-Thank you for your interest in contributing to DNO-Oracle! We welcome contributions from the community.
+¡Gracias por tu interés en contribuir a DNO-Oracle! Esta guía te ayudará a entender cómo puedes participar en el desarrollo del proyecto.
 
-## 🚀 Getting Started
+## 🎯 Tipos de Contribuciones
 
-1. **Fork the Repository**
+### 🔧 Código
+- Nuevas funcionalidades
+- Corrección de bugs
+- Optimizaciones de performance
+- Mejoras en la arquitectura
+
+### 📚 Documentación
+- Mejoras en README
+- Ejemplos de código
+- Tutoriales
+- Documentación de API
+
+### 🧪 Testing
+- Casos de prueba adicionales
+- Tests de integración
+- Benchmarks
+- Tests para diferentes entornos
+
+## 🚀 Comenzando
+
+### Configuración del Entorno de Desarrollo
+
+1. **Fork y Clone**
    ```bash
-   git clone https://github.com/jferreyradev/dno-oracle.git
+   # Fork en GitHub, luego:
+   git clone https://github.com/tu-usuario/dno-oracle.git
    cd dno-oracle
+   git remote add upstream https://github.com/jferreyra-dev/dno-oracle.git
+   ```
+
+2. **Configurar Entorno**
+   ```bash
+   # Configurar variables de entorno
+   cp .env.example .env
+   # Editar .env con tus datos de Oracle
+   
+   # Instalar y verificar
+   ./run.sh install
+   ./run.sh diagnose
+   ```
+
+## 🛠️ Proceso de Desarrollo
+
+### 1. Crear Rama de Desarrollo
+
+```bash
+# Sincronizar con upstream
+git checkout main
+git pull upstream main
+
+# Crear rama para tu feature
+git checkout -b feature/nombre-descriptivo
+# Para bugs: git checkout -b fix/descripcion-del-bug
+# Para docs: git checkout -b docs/mejora-documentacion
+```
+
+### 2. Desarrollar y Probar
+
+```bash
+# Desarrollar tu funcionalidad
+# Ejecutar pruebas
+./run.sh test
+./run.sh test:advanced
+
+# Verificar formato
+deno fmt --check
+deno lint
+```
+
+### 3. Commit y Push
+
+```bash
+# Commit con mensaje descriptivo
+git commit -m "feat: agregar soporte para [funcionalidad]"
+git push origin feature/nombre-descriptivo
+```
+
+### 4. Crear Pull Request
+
+- Describe claramente los cambios
+- Incluye tests si es aplicable
+- Referencia issues relacionados
    ```
 
 2. **Set Up Environment**

@@ -1,9 +1,9 @@
 /**
  * Script para ejecutar archivos SQL usando la librería DNO-Oracle
- * Uso: deno run --allow-net --allow-read --allow-env --allow-ffi scripts/sql-executor.js [archivo.sql]
+ * Uso: deno run --allow-net --allow-read --allow-env --allow-ffi scripts/common/sql-executor.js [archivo.sql]
  */
 
-import { exec, open, close } from "../src/db.js";
+import { exec, open, close } from "../../src/db.js";
 
 // Función para leer y procesar archivo SQL
 async function readSqlFile(filePath) {

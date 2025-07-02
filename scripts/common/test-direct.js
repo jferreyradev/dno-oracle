@@ -2,7 +2,7 @@
  * Test directo usando el API básico
  */
 
-import { open, close, exec } from "../src/db-improved.js";
+import { open, close, exec } from "../../src/db-improved.js";
 
 async function testBasic() {
   console.log("🧪 Test directo con API básico");
