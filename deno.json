@@ -1,0 +1,31 @@
+{
+  "name": "dno-oracle",
+  "version": "1.0.0",
+  "description": "Oracle Database connection module for Deno",
+  "main": "src/db.js",
+  "type": "module",
+  "exports": {
+    ".": "./src/db.js",
+    "./db": "./src/db.js"
+  },
+  "scripts": {
+    "test": "deno run --allow-net --allow-read --allow-env --allow-ffi tests/test-connection.js",
+    "test:advanced": "deno run --allow-net --allow-read --allow-env --allow-ffi tests/test-connection-advanced.js",
+    "test:final": "deno run --allow-net --allow-read --allow-env --allow-ffi tests/test-final.js",
+    "setup": "./scripts/oracle-setup.sh",
+    "diagnose": "./scripts/diagnose-oracle.sh",
+    "fix-dns": "./scripts/fix-dns.sh"
+  },
+  "permissions": {
+    "net": "Oracle database connection",
+    "read": "Read configuration files",
+    "env": "Access environment variables",
+    "ffi": "Oracle Instant Client native libraries"
+  },
+  "dependencies": {
+    "oracledb": "npm:oracledb@6.0.2"
+  },
+  "imports": {
+    "@std/dotenv": "https://deno.land/std@0.204.0/dotenv/mod.ts"
+  }
+}

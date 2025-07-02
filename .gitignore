@@ -1,0 +1,72 @@
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# Archivos de configuración sensibles
+config/database.json
+config/production.json
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencias
+node_modules/
+.npm
+.yarn/
+
+# Deno
+.deno/
+deno_modules/
+
+# Archivos temporales
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Archivos de sistema
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de backup
+*.bak
+*.backup
+*.orig
+
+# Archivos de testing
+coverage/
+.nyc_output/
+test-results/
+
+# Archivos específicos del proyecto
+instantclient*/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Documentación generada
+docs/generated/
+*.pdf
+
+# Archivos de Oracle
+tnsnames.ora
+sqlnet.ora
+listener.ora
