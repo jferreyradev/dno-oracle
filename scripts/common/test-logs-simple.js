@@ -2,7 +2,7 @@
  * Test simple para verificar que las tablas de logs funcionan
  */
 
-import { open, close, exec } from "../src/db.js";
+import { open, close, exec } from "../../src/db.js";
 
 async function testLogsTable() {
   console.log("🧪 Probando tabla de logs...");

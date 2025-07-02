@@ -2,7 +2,7 @@
  * Script de diagnóstico simple para probar la conexión Oracle
  */
 
-import { exec, open, close } from "../src/db-improved.js";
+import { exec, open, close } from "../../src/db-improved.js";
 
 async function testConnection() {
   try {

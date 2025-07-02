@@ -2,7 +2,7 @@
  * Test con el módulo original db.js
  */
 
-import { open, close, exec } from "../src/db.js";
+import { open, close, exec } from "../../src/db.js";
 
 async function testOriginal() {
   console.log("🧪 Test con módulo original");

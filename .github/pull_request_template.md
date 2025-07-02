@@ -1,22 +1,49 @@
 ## 📋 Pull Request Description
 
-### 🎯 What does this PR do?
-Brief description of what this pull request accomplishes.
+### 🎯 ¿Qué hace este PR?
+Descripción breve de lo que logra este pull request.
 
-### 🔗 Related Issues
-- Closes #(issue_number)
-- Related to #(issue_number)
+### 🔗 Issues Relacionados
+- Closes #(numero_issue)
+- Related to #(numero_issue)
+- Fixes #(numero_issue)
 
-### 🛠️ Type of Change
-- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
-- [ ] ✨ New feature (non-breaking change which adds functionality)
-- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] 📚 Documentation update
-- [ ] 🔧 Configuration change
-- [ ] 🧪 Test addition/modification
-- [ ] ♻️ Refactoring (no functional changes)
+### 🛠️ Tipo de Cambio
+- [ ] 🐛 Bug fix (cambio que corrige un issue sin romper funcionalidad)
+- [ ] ✨ Nueva funcionalidad (cambio que agrega funcionalidad sin romper la existente)
+- [ ] 💥 Breaking change (fix o feature que cambiaría funcionalidad existente)
+- [ ] 📚 Actualización de documentación
+- [ ] 🔧 Cambio de configuración
+- [ ] 🧪 Adición/modificación de tests
+- [ ] ♻️ Refactoring (sin cambios funcionales)
+- [ ] ⚡ Mejora de performance
+- [ ] 🌐 Soporte multiplataforma (Windows/Linux)
 
 ## ✅ Testing
+
+### Pruebas Ejecutadas
+- [ ] Tests básicos (`./run.sh test` o `.\run.ps1 test`)
+- [ ] Tests avanzados (`./run.sh test:advanced`)
+- [ ] Tests completos (`./run.sh test:final`)
+- [ ] Demostración completa (`./run.sh demo:complete`)
+- [ ] Verificación de estructura (`./verify-structure.ps1`)
+- [ ] Tests de API manual
+- [ ] Verificación multiplataforma
+
+### Entornos Probados
+- [ ] Windows 10/11 con PowerShell
+- [ ] Linux (Ubuntu/CentOS)
+- [ ] Oracle 19c
+- [ ] Oracle 21c
+- [ ] Deno 1.40+
+
+**Detalles de pruebas:**
+```bash
+# Comandos ejecutados para verificar
+./run.sh test
+./run.sh demo:complete
+# Resultado: ✅ Todas las pruebas pasaron
+```
 
 ### 🧪 Tests Added/Modified
 - [ ] Unit tests
