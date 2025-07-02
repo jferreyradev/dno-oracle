@@ -7,6 +7,7 @@ import { oracledb, load } from "../deps.ts";
 
 // Configuración global de Oracle
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+oracledb.fetchAsString = [oracledb.CLOB]; // Convertir CLOBs a strings automáticamente
 
 // Variables de entorno
 const env = await load();

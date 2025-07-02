@@ -1,0 +1,462 @@
+{
+  "entities": {
+    "proc_cab": {
+      "tableName": "WORKFLOW.PROC_CAB",
+      "primaryKey": "ID_PROC_CAB",
+      "autoIncrement": true,
+      "displayName": "Procesos de Cabecera",
+      "description": "Tabla de procesos de cabecera del sistema workflow",
+      "fields": {
+        "ID_PROC_CAB": {
+          "type": "NUMBER",
+          "required": true,
+          "primaryKey": true,
+          "autoIncrement": true,
+          "displayName": "ID",
+          "description": "Identificador único del proceso",
+          "readonly": true
+        },
+        "DESCRIPCION": {
+          "type": "VARCHAR2",
+          "length": 100,
+          "required": false,
+          "displayName": "Descripción",
+          "description": "Descripción del proceso",
+          "searchable": true
+        },
+        "OBSERVACIONES": {
+          "type": "VARCHAR2",
+          "length": 512,
+          "required": false,
+          "displayName": "Observaciones",
+          "description": "Observaciones adicionales del proceso",
+          "searchable": true
+        },
+        "MOSTRAR": {
+          "type": "INTEGER",
+          "required": true,
+          "default": 0,
+          "displayName": "Mostrar",
+          "description": "Indica si el proceso debe mostrarse (0=No, 1=Sí)",
+          "values": [
+            { "value": 0, "label": "No mostrar" },
+            { "value": 1, "label": "Mostrar" }
+          ]
+        },
+        "FECHA_CREACION": {
+          "type": "TIMESTAMP",
+          "required": false,
+          "readonly": true,
+          "displayName": "Fecha de Creación",
+          "description": "Fecha y hora de creación del registro"
+        },
+        "USUARIO_CREACION": {
+          "type": "VARCHAR2",
+          "length": 50,
+          "required": false,
+          "readonly": true,
+          "displayName": "Usuario Creación",
+          "description": "Usuario que creó el registro"
+        }
+      },
+      "operations": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true,
+        "search": true,
+        "paginate": true
+      },
+      "filters": {
+        "visible": {
+          "field": "MOSTRAR",
+          "operator": "=",
+          "value": 1,
+          "displayName": "Solo visibles"
+        },
+        "hidden": {
+          "field": "MOSTRAR",
+          "operator": "=",
+          "value": 0,
+          "displayName": "Solo ocultos"
+        },
+        "recent": {
+          "field": "FECHA_CREACION",
+          "operator": ">=",
+          "value": "SYSDATE - 7",
+          "displayName": "Últimos 7 días"
+        }
+      },
+      "validations": {
+        "DESCRIPCION": {
+          "maxLength": 100,
+          "message": "La descripción no puede exceder 100 caracteres"
+        },
+        "OBSERVACIONES": {
+          "maxLength": 512,
+          "message": "Las observaciones no pueden exceder 512 caracteres"
+        },
+        "MOSTRAR": {
+          "allowedValues": [0, 1],
+          "message": "El campo MOSTRAR debe ser 0 o 1"
+        }
+      },
+      "customActions": {
+        "toggle-mostrar": {
+          "type": "UPDATE",
+          "sql": "UPDATE WORKFLOW.PROC_CAB SET MOSTRAR = CASE WHEN MOSTRAR = 1 THEN 0 ELSE 1 END WHERE ID_PROC_CAB = :id",
+          "displayName": "Cambiar visibilidad",
+          "description": "Cambia el estado de visibilidad del proceso"
+        },
+        "hide": {
+          "type": "UPDATE",
+          "sql": "UPDATE WORKFLOW.PROC_CAB SET MOSTRAR = 0 WHERE ID_PROC_CAB = :id",
+          "displayName": "Ocultar",
+          "description": "Oculta el proceso"
+        },
+        "show": {
+          "type": "UPDATE",
+          "sql": "UPDATE WORKFLOW.PROC_CAB SET MOSTRAR = 1 WHERE ID_PROC_CAB = :id",
+          "displayName": "Mostrar",
+          "description": "Hace visible el proceso"
+        },
+        "archive": {
+          "type": "UPDATE",
+          "sql": "UPDATE WORKFLOW.PROC_CAB SET MOSTRAR = 0, OBSERVACIONES = OBSERVACIONES || ' [ARCHIVADO]' WHERE ID_PROC_CAB = :id",
+          "displayName": "Archivar",
+          "description": "Archiva el proceso (lo oculta y agrega marca de archivado)"
+        }
+      }
+    },
+    "users": {
+      "tableName": "USERS",
+      "primaryKey": "USER_ID",
+      "autoIncrement": true,
+      "displayName": "Usuarios",
+      "description": "Tabla de usuarios del sistema",
+      "fields": {
+        "USER_ID": {
+          "type": "NUMBER",
+          "required": true,
+          "primaryKey": true,
+          "autoIncrement": true,
+          "displayName": "ID Usuario",
+          "description": "Identificador único del usuario",
+          "readonly": true
+        },
+        "USERNAME": {
+          "type": "VARCHAR2",
+          "length": 50,
+          "required": true,
+          "unique": true,
+          "displayName": "Nombre de usuario",
+          "description": "Nombre único de usuario",
+          "searchable": true
+        },
+        "EMAIL": {
+          "type": "VARCHAR2",
+          "length": 100,
+          "required": true,
+          "unique": true,
+          "displayName": "Email",
+          "description": "Correo electrónico del usuario",
+          "searchable": true,
+          "format": "email"
+        },
+        "FULL_NAME": {
+          "type": "VARCHAR2",
+          "length": 100,
+          "required": false,
+          "displayName": "Nombre completo",
+          "description": "Nombre completo del usuario",
+          "searchable": true
+        },
+        "IS_ACTIVE": {
+          "type": "NUMBER",
+          "required": true,
+          "default": 1,
+          "displayName": "Activo",
+          "description": "Estado del usuario (0=Inactivo, 1=Activo)",
+          "values": [
+            { "value": 0, "label": "Inactivo" },
+            { "value": 1, "label": "Activo" }
+          ]
+        },
+        "ROLE": {
+          "type": "VARCHAR2",
+          "length": 20,
+          "required": true,
+          "default": "user",
+          "displayName": "Rol",
+          "description": "Rol del usuario en el sistema",
+          "values": [
+            { "value": "admin", "label": "Administrador" },
+            { "value": "user", "label": "Usuario" },
+            { "value": "viewer", "label": "Solo lectura" }
+          ]
+        },
+        "CREATED_AT": {
+          "type": "TIMESTAMP",
+          "required": false,
+          "readonly": true,
+          "displayName": "Fecha de creación",
+          "description": "Fecha y hora de creación del usuario"
+        },
+        "UPDATED_AT": {
+          "type": "TIMESTAMP",
+          "required": false,
+          "readonly": true,
+          "displayName": "Fecha de actualización",
+          "description": "Fecha y hora de última actualización"
+        },
+        "LAST_LOGIN": {
+          "type": "TIMESTAMP",
+          "required": false,
+          "readonly": true,
+          "displayName": "Último login",
+          "description": "Fecha y hora del último acceso"
+        }
+      },
+      "operations": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true,
+        "search": true,
+        "paginate": true
+      },
+      "filters": {
+        "active": {
+          "field": "IS_ACTIVE",
+          "operator": "=",
+          "value": 1,
+          "displayName": "Solo activos"
+        },
+        "inactive": {
+          "field": "IS_ACTIVE",
+          "operator": "=",
+          "value": 0,
+          "displayName": "Solo inactivos"
+        },
+        "admins": {
+          "field": "ROLE",
+          "operator": "=",
+          "value": "admin",
+          "displayName": "Solo administradores"
+        },
+        "recent": {
+          "field": "CREATED_AT",
+          "operator": ">=",
+          "value": "SYSDATE - 30",
+          "displayName": "Registrados últimos 30 días"
+        }
+      },
+      "validations": {
+        "USERNAME": {
+          "required": true,
+          "minLength": 3,
+          "maxLength": 50,
+          "pattern": "^[a-zA-Z0-9_]+$",
+          "message": "El nombre de usuario debe tener entre 3-50 caracteres y solo letras, números y guiones bajos"
+        },
+        "EMAIL": {
+          "required": true,
+          "format": "email",
+          "maxLength": 100,
+          "message": "Debe ser un email válido de máximo 100 caracteres"
+        },
+        "FULL_NAME": {
+          "maxLength": 100,
+          "message": "El nombre completo no puede exceder 100 caracteres"
+        },
+        "IS_ACTIVE": {
+          "allowedValues": [0, 1],
+          "message": "El estado debe ser 0 o 1"
+        },
+        "ROLE": {
+          "allowedValues": ["admin", "user", "viewer"],
+          "message": "El rol debe ser admin, user o viewer"
+        }
+      },
+      "customActions": {
+        "activate": {
+          "type": "UPDATE",
+          "sql": "UPDATE USERS SET IS_ACTIVE = 1, UPDATED_AT = SYSDATE WHERE USER_ID = :id",
+          "displayName": "Activar usuario",
+          "description": "Activa un usuario inactivo"
+        },
+        "deactivate": {
+          "type": "UPDATE",
+          "sql": "UPDATE USERS SET IS_ACTIVE = 0, UPDATED_AT = SYSDATE WHERE USER_ID = :id",
+          "displayName": "Desactivar usuario",
+          "description": "Desactiva un usuario activo"
+        },
+        "promote-to-admin": {
+          "type": "UPDATE",
+          "sql": "UPDATE USERS SET ROLE = 'admin', UPDATED_AT = SYSDATE WHERE USER_ID = :id",
+          "displayName": "Promover a administrador",
+          "description": "Cambia el rol del usuario a administrador"
+        },
+        "reset-to-user": {
+          "type": "UPDATE",
+          "sql": "UPDATE USERS SET ROLE = 'user', UPDATED_AT = SYSDATE WHERE USER_ID = :id",
+          "displayName": "Restablecer a usuario",
+          "description": "Cambia el rol del usuario a usuario normal"
+        },
+        "update-login": {
+          "type": "UPDATE",
+          "sql": "UPDATE USERS SET LAST_LOGIN = SYSDATE WHERE USER_ID = :id",
+          "displayName": "Actualizar último login",
+          "description": "Actualiza la fecha del último acceso"
+        }
+      }
+    },
+    "logs": {
+      "tableName": "SYSTEM_LOGS",
+      "primaryKey": "LOG_ID",
+      "autoIncrement": true,
+      "displayName": "Logs del Sistema",
+      "description": "Tabla de logs y auditoría del sistema",
+      "fields": {
+        "LOG_ID": {
+          "type": "NUMBER",
+          "required": true,
+          "primaryKey": true,
+          "autoIncrement": true,
+          "displayName": "ID Log",
+          "readonly": true
+        },
+        "LEVEL": {
+          "type": "VARCHAR2",
+          "length": 10,
+          "required": true,
+          "displayName": "Nivel",
+          "description": "Nivel del log",
+          "values": [
+            { "value": "ERROR", "label": "Error" },
+            { "value": "WARN", "label": "Advertencia" },
+            { "value": "INFO", "label": "Información" },
+            { "value": "DEBUG", "label": "Debug" }
+          ]
+        },
+        "MESSAGE": {
+          "type": "VARCHAR2",
+          "length": 1000,
+          "required": true,
+          "displayName": "Mensaje",
+          "description": "Mensaje del log",
+          "searchable": true
+        },
+        "MODULE": {
+          "type": "VARCHAR2",
+          "length": 50,
+          "required": false,
+          "displayName": "Módulo",
+          "description": "Módulo que generó el log",
+          "searchable": true
+        },
+        "USER_ID": {
+          "type": "NUMBER",
+          "required": false,
+          "displayName": "ID Usuario",
+          "description": "ID del usuario relacionado"
+        },
+        "IP_ADDRESS": {
+          "type": "VARCHAR2",
+          "length": 45,
+          "required": false,
+          "displayName": "IP",
+          "description": "Dirección IP del cliente"
+        },
+        "CREATED_AT": {
+          "type": "TIMESTAMP",
+          "required": true,
+          "readonly": true,
+          "default": "SYSDATE",
+          "displayName": "Fecha",
+          "description": "Fecha y hora del log"
+        }
+      },
+      "operations": {
+        "create": true,
+        "read": true,
+        "update": false,
+        "delete": false,
+        "search": true,
+        "paginate": true
+      },
+      "filters": {
+        "errors": {
+          "field": "LEVEL",
+          "operator": "=",
+          "value": "ERROR",
+          "displayName": "Solo errores"
+        },
+        "warnings": {
+          "field": "LEVEL",
+          "operator": "IN",
+          "value": ["ERROR", "WARN"],
+          "displayName": "Errores y advertencias"
+        },
+        "today": {
+          "field": "CREATED_AT",
+          "operator": ">=",
+          "value": "TRUNC(SYSDATE)",
+          "displayName": "Hoy"
+        },
+        "last-hour": {
+          "field": "CREATED_AT",
+          "operator": ">=",
+          "value": "SYSDATE - 1/24",
+          "displayName": "Última hora"
+        }
+      },
+      "validations": {
+        "LEVEL": {
+          "required": true,
+          "allowedValues": ["ERROR", "WARN", "INFO", "DEBUG"],
+          "message": "El nivel debe ser ERROR, WARN, INFO o DEBUG"
+        },
+        "MESSAGE": {
+          "required": true,
+          "maxLength": 1000,
+          "message": "El mensaje es requerido y no puede exceder 1000 caracteres"
+        },
+        "MODULE": {
+          "maxLength": 50,
+          "message": "El módulo no puede exceder 50 caracteres"
+        }
+      }
+    }
+  },
+  "settings": {
+    "defaultPageSize": 10,
+    "maxPageSize": 100,
+    "dateFormat": "YYYY-MM-DD",
+    "timestampFormat": "YYYY-MM-DD HH:mm:ss",
+    "errorMessages": {
+      "notFound": "Registro no encontrado",
+      "invalidId": "ID inválido",
+      "validationError": "Error de validación",
+      "duplicateEntry": "Ya existe un registro con estos datos",
+      "serverError": "Error interno del servidor",
+      "unauthorized": "No autorizado",
+      "forbidden": "Acceso denegado"
+    },
+    "features": {
+      "auditTrail": true,
+      "softDelete": false,
+      "pagination": true,
+      "search": true,
+      "export": true,
+      "cache": false,
+      "rateLimiting": false
+    },
+    "cors": {
+      "enabled": true,
+      "origins": ["*"],
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "headers": ["Content-Type", "Authorization"]
+    }
+  }
+}
