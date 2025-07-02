@@ -7,6 +7,9 @@ Una librería simple y robusta para conectar aplicaciones Deno con bases de dato
 [![Deno](https://img.shields.io/badge/deno-v1.40+-green.svg)](https://deno.land)
 [![Oracle](https://img.shields.io/badge/oracle-11g%2B-red.svg)](https://www.oracle.com/database/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![API](https://img.shields.io/badge/REST_API-included-blue.svg)](#-api-rest)
+[![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue.svg)](https://www.typescriptlang.org/)
+[![SQL](https://img.shields.io/badge/SQL_executor-included-orange.svg)](#-scripts-y-utilidades)
 
 ## 🎯 Características
 
