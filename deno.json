@@ -1,31 +1,45 @@
 {
   "name": "dno-oracle",
   "version": "1.0.0",
-  "description": "Oracle Database connection module for Deno",
-  "main": "src/db.js",
-  "type": "module",
+  "description": "Oracle Database API Server for Deno - Proyecto Independiente",
   "exports": {
-    ".": "./src/db.js",
-    "./db": "./src/db.js"
+    ".": "./api/server-enhanced.ts"
   },
-  "scripts": {
-    "test": "deno run --allow-net --allow-read --allow-env --allow-ffi tests/test-connection.js",
-    "test:advanced": "deno run --allow-net --allow-read --allow-env --allow-ffi tests/test-connection-advanced.js",
-    "test:final": "deno run --allow-net --allow-read --allow-env --allow-ffi tests/test-final.js",
-    "setup": "./scripts/oracle-setup.sh",
-    "diagnose": "./scripts/diagnose-oracle.sh",
-    "fix-dns": "./scripts/fix-dns.sh"
+  "compilerOptions": {
+    "lib": ["deno.window", "deno.ns"],
+    "strict": true
+  },
+  "tasks": {
+    "start": "deno run --allow-all api/server-enhanced.ts",
+    "dev": "deno run --allow-all --watch api/server-enhanced.ts",
+    "test": "deno run --allow-all test-integration.ts",
+    "check": "deno check api/server-enhanced.ts",
+    "fmt": "deno fmt",
+    "lint": "deno lint"
   },
   "permissions": {
-    "net": "Oracle database connection",
-    "read": "Read configuration files",
-    "env": "Access environment variables",
+    "net": "Oracle database connection and HTTP server",
+    "read": "Read configuration files and static assets",
+    "env": "Access environment variables for database configuration",
     "ffi": "Oracle Instant Client native libraries"
   },
   "dependencies": {
     "oracledb": "npm:oracledb@6.0.2"
   },
   "imports": {
-    "@std/dotenv": "https://deno.land/std@0.204.0/dotenv/mod.ts"
+    "@std/dotenv": "https://deno.land/std@0.208.0/dotenv/mod.ts",
+    "@std/http": "https://deno.land/std@0.208.0/http/mod.ts"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 120,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": false
   }
 }
