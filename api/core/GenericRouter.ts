@@ -4,10 +4,10 @@
 
 import { Router } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import { entityConfig } from './EntityConfig.ts';
-import { GenericController } from './GenericControllerFixed.ts';
+import { GenericControllerV2 } from './GenericControllerV2.ts';
 
 interface EntityRouterMap {
-  [entityName: string]: GenericController;
+  [entityName: string]: GenericControllerV2;
 }
 
 export class GenericRouter {
@@ -28,7 +28,7 @@ export class GenericRouter {
       
       // Crear controladores para cada entidad
       for (const [entityName, entityConf] of Object.entries(config.entities)) {
-        this.controllers[entityName] = new GenericController(entityName, entityConf);
+        this.controllers[entityName] = new GenericControllerV2(entityName, entityConf);
         this.registerEntityRoutes(entityName, entityConf);
       }
 
@@ -55,7 +55,7 @@ export class GenericRouter {
     if (entityConf.operations.read) {
       // GET /api/{entity} - Listar todos con paginación y filtros
       this.router.get(basePath, async (ctx) => {
-        await controller.getAll(ctx as never);
+        await controller.list(ctx as never);
       });
 
       // GET /api/{entity}/:id - Obtener por ID
@@ -85,7 +85,8 @@ export class GenericRouter {
       });
     }
 
-    // Rutas para filtros predefinidos
+    // Rutas para filtros predefinidos (comentadas temporalmente)
+    /*
     if (entityConf.filters) {
       Object.keys(entityConf.filters).forEach(_filterName => {
         // GET /api/{entity}/filter/{filterName} - Aplicar filtro predefinido
@@ -94,8 +95,10 @@ export class GenericRouter {
         });
       });
     }
+    */
 
-    // Rutas para acciones personalizadas
+    // Rutas para acciones personalizadas (comentadas temporalmente)
+    /*
     if (entityConf.customActions) {
       Object.keys(entityConf.customActions).forEach(_actionName => {
         // POST /api/{entity}/:id/action/{actionName} - Ejecutar acción personalizada
@@ -104,6 +107,7 @@ export class GenericRouter {
         });
       });
     }
+    */
 
     console.log(`   📝 Rutas registradas para '${entityName}':`);
     console.log(`      - GET    ${basePath} (${entityConf.operations.read ? '✅' : '❌'})`);
@@ -113,11 +117,11 @@ export class GenericRouter {
     console.log(`      - DELETE ${basePath}/:id (${entityConf.operations.delete ? '✅' : '❌'})`);
     
     if (entityConf.filters) {
-      console.log(`      - GET    ${basePath}/filter/:filter (${Object.keys(entityConf.filters).length} filtros)`);
+      console.log(`      - GET    ${basePath}/filter/:filter (⚠️ ${Object.keys(entityConf.filters).length} filtros - temporalmente deshabilitados)`);
     }
     
     if (entityConf.customActions) {
-      console.log(`      - POST   ${basePath}/:id/action/:action (${Object.keys(entityConf.customActions).length} acciones)`);
+      console.log(`      - POST   ${basePath}/:id/action/:action (⚠️ ${Object.keys(entityConf.customActions).length} acciones - temporalmente deshabilitadas)`);
     }
   }
 
@@ -322,7 +326,7 @@ export class GenericRouter {
   /**
    * Obtiene el controlador de una entidad específica
    */
-  getController(entityName: string): GenericController | undefined {
+  getController(entityName: string): GenericControllerV2 | undefined {
     return this.controllers[entityName];
   }
 
