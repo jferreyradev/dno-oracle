@@ -8,6 +8,7 @@ import { entityConfig } from './core/EntityConfig.ts';
 import { GenericControllerV2 } from './core/GenericControllerV2.ts';
 import { MemoryCache, type CacheConfig } from './core/CacheService.ts';
 import { AuthService, type AuthConfig } from './core/AuthService.ts';
+import { QueryRouter } from './core/QueryRouter.ts';
 
 class GenericApiServer {
   private app: Application;
@@ -172,6 +173,12 @@ class GenericApiServer {
 
       console.log(`✅ Rutas registradas para entidad: ${entityName}`);
     });
+
+    // Registrar rutas de consultas SQL directas
+    const queryRouter = new QueryRouter();
+    this.app.use(queryRouter.getRouter().routes());
+    this.app.use(queryRouter.getRouter().allowedMethods());
+    console.log(`✅ Rutas de consultas SQL registradas`);
 
     // Ruta para limpiar todo el cache
     if (this.cache) {
