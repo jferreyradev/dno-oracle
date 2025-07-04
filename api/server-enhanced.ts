@@ -9,6 +9,7 @@ import { GenericControllerV2 } from './core/GenericControllerV2.ts';
 import { MemoryCache, type CacheConfig } from './core/CacheService.ts';
 import { AuthService, type AuthConfig } from './core/AuthService.ts';
 import { QueryRouter } from './core/QueryRouter.ts';
+import { FileImportRouter } from './core/FileImportRouter.ts';
 
 class GenericApiServer {
   private app: Application;
@@ -109,7 +110,9 @@ class GenericApiServer {
           features: {
             cache: !!this.cache,
             authentication: !!this.authService,
-            entities: entities.length
+            entities: entities.length,
+            procedures: true,
+            fileImport: true
           },
           entities: entities.map(name => ({
             name,
@@ -127,7 +130,17 @@ class GenericApiServer {
               `GET /api/${entities[0]}/cache/stats`,
               `DELETE /api/${entities[0]}/cache/clear`
             ]
-          } : null
+          } : null,
+          fileImport: {
+            endpoints: [
+              'POST /api/import/csv',
+              'POST /api/import/validate',
+              'POST /api/import/headers',
+              'POST /api/import/mapping',
+              'GET /api/import/info',
+              'GET /api/import/columns/:tableName'
+            ]
+          },
         }
       };
     });
@@ -199,6 +212,12 @@ class GenericApiServer {
         };
       });
     }
+
+    // Registrar rutas de importación de archivos
+    const fileImportRouter = FileImportRouter.getRouter();
+    this.app.use(fileImportRouter.routes());
+    this.app.use(fileImportRouter.allowedMethods());
+    console.log(`✅ Rutas de importación de archivos registradas`);
 
     // Registrar rutas en la aplicación
     this.app.use(this.router.routes());

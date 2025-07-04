@@ -4,10 +4,190 @@ Este directorio contiene herramientas para generar automáticamente la configura
 
 ## 🎯 Características
 
-- **Análisis automático** de estructura de tablas Oracle
-- **Detección inteligente** de tipos de datos, constraints y relaciones
-- **Generación automática** de filtros, validaciones y acciones personalizadas
-- **Soporte multiplataforma** (Windows PowerShell, Linux/macOS Bash)
+- ✅ **Conexión automática a Oracle** con soporte para Instant Client
+- ✅ **Análisis automático de estructura** de tabla (columnas, tipos, constraints)
+- ✅ **Detección automática de clave primaria** y auto-increment
+- ✅ **Mapeo de tipos Oracle** a tipos genéricos del sistema
+- ✅ **Generación de campos searchable** para tipos VARCHAR2
+- ✅ **Soporte para esquemas** (ej: WORKFLOW.TABLA)
+- ✅ **Interfaz de línea de comandos** amigable con PowerShell
+- ✅ **Guardado automático** en archivo o integración con entities.json
+
+## 📋 Prerrequisitos
+
+1. **Deno** instalado y en el PATH
+2. **Oracle Instant Client** instalado y configurado
+3. **Archivo .env** con configuración de Oracle
+4. **Permisos** de lectura en las vistas ALL_TABLES, ALL_TAB_COLUMNS, etc.
+
+## ⚙️ Configuración
+
+Asegúrate de tener configuradas las siguientes variables en tu archivo `.env`:
+
+```env
+USER=tu_usuario_oracle
+PASSWORD=tu_contraseña
+CONNECTIONSTRING=host:puerto/servicio
+LIB_ORA=C:\instantclient_21_10
+```
+
+## 🚀 Uso
+
+### Uso básico (PowerShell)
+
+```powershell
+# Generar configuración para una tabla
+.\generate-entity.ps1 -Tabla "WORKFLOW.PROC_CAB"
+
+# Generar con nombre de entidad específico
+.\generate-entity.ps1 -Tabla "WORKFLOW.ADIFDO" -Entidad "adifdo"
+
+# Guardar en archivo específico
+.\generate-entity.ps1 -Tabla "USUARIOS" -Archivo "usuarios-config.json"
+
+# Agregar automáticamente al archivo entities.json
+.\generate-entity.ps1 -Tabla "USUARIOS" -Agregar
+```
+
+### Uso directo (Deno)
+
+```bash
+# Generar configuración básica
+deno run --allow-all scripts/generate-entity-config.ts "WORKFLOW.PROC_CAB"
+
+# Generar con nombre de entidad específico
+deno run --allow-all scripts/generate-entity-config.ts "WORKFLOW.ADIFDO" "adifdo"
+
+# Modo silencioso (solo salida JSON)
+deno run --allow-all scripts/generate-entity-config.ts "USUARIOS" --silent
+```
+
+## 📤 Salida
+
+El script genera una configuración JSON completa que incluye:
+
+```json
+{
+  "nombre_entidad": {
+    "tableName": "ESQUEMA.TABLA",
+    "primaryKey": "ID_CAMPO",
+    "autoIncrement": false,
+    "displayName": "Nombre Entidad",
+    "description": "Tabla ESQUEMA.TABLA",
+    "fields": {
+      "CAMPO1": {
+        "type": "NUMBER",
+        "required": true,
+        "displayName": "Campo 1",
+        "description": "Campo Campo 1",
+        "searchable": false,
+        "primaryKey": true,
+        "readonly": true
+      },
+      "CAMPO2": {
+        "type": "VARCHAR2",
+        "required": false,
+        "displayName": "Campo 2",
+        "description": "Campo Campo 2",
+        "searchable": true,
+        "length": 100
+      }
+    }
+  }
+}
+```
+
+## 🗂️ Tipos soportados
+
+El script mapea automáticamente los tipos de Oracle a tipos genéricos del sistema:
+
+| Tipo Oracle | Tipo Genérico | Observaciones |
+|-------------|---------------|---------------|
+| NUMBER (escala=0, precisión≤10) | INTEGER | Números enteros |
+| NUMBER (otros) | NUMBER | Números decimales |
+| VARCHAR2, CHAR, NVARCHAR2, NCHAR | VARCHAR2 | Cadenas de texto |
+| DATE | DATE | Fechas |
+| TIMESTAMP | TIMESTAMP | Fechas con hora |
+| CLOB, NCLOB | CLOB | Texto largo |
+| BLOB | BLOB | Datos binarios |
+| RAW | RAW | Datos binarios raw |
+
+## 🔍 Características detectadas automáticamente
+
+- **Clave primaria**: Se detecta automáticamente desde constraints
+- **Campos requeridos**: Basado en columnas NOT NULL
+- **Campos searchable**: Automáticamente para tipos VARCHAR2
+- **Longitud de campos**: Para tipos VARCHAR2
+- **Precisión y escala**: Para tipos NUMBER
+- **Valores por defecto**: Se extraen de la definición de la tabla
+- **Auto-increment**: Se detecta buscando triggers con secuencias
+
+## 💡 Ejemplos de uso común
+
+### Generar configuración para tabla de usuarios
+
+```powershell
+.\generate-entity.ps1 -Tabla "SISTEMA.USUARIOS" -Entidad "usuarios"
+```
+
+### Generar múltiples configuraciones
+
+```powershell
+# Generar configuraciones para múltiples tablas
+$tablas = @("SISTEMA.USUARIOS", "SISTEMA.PERFILES", "SISTEMA.PERMISOS")
+foreach ($tabla in $tablas) {
+    $entidad = $tabla.Split('.')[1].ToLower()
+    .\generate-entity.ps1 -Tabla $tabla -Entidad $entidad -Archivo "$entidad-config.json"
+}
+```
+
+### Integración con entities.json
+
+```powershell
+# Agregar automáticamente al archivo entities.json
+.\generate-entity.ps1 -Tabla "SISTEMA.USUARIOS" -Agregar
+```
+
+## 🔧 Solución de problemas
+
+### Error: "Tabla no existe o no es accesible"
+
+1. Verifica que el nombre de la tabla sea correcto
+2. Asegúrate de incluir el esquema si es necesario
+3. Confirma que el usuario tiene permisos de lectura en la tabla
+
+### Error: "Faltan variables de entorno Oracle"
+
+1. Verifica que el archivo `.env` existe
+2. Confirma que las variables USER, PASSWORD, y CONNECTIONSTRING están definidas
+3. Revisa que no haya espacios extra en las líneas del archivo `.env`
+
+### Error: "connections to this database server version are not supported"
+
+1. Verifica que Oracle Instant Client esté instalado correctamente
+2. Confirma que la variable LIB_ORA apunte al directorio correcto
+3. Asegúrate de que la versión de Instant Client sea compatible con tu Oracle Server
+
+## 📁 Archivos del proyecto
+
+- `scripts/generate-entity-config.ts`: Script principal en TypeScript
+- `generate-entity.ps1`: Wrapper PowerShell multiplataforma
+- `generate-entity.sh`: Wrapper Bash para Linux/macOS
+- `config/entities.json`: Archivo de configuración principal
+
+## 🤝 Contribuir
+
+Para contribuir al proyecto:
+
+1. Crea un fork del repositorio
+2. Realiza tus cambios en una rama nueva
+3. Ejecuta las pruebas: `deno test`
+4. Formatea el código: `deno fmt`
+5. Envía un pull request
+
+## 📄 Licencia
+
+Este proyecto está bajo la misma licencia que el proyecto DNO-Oracle.
 - **Integración directa** con el archivo `entities.json`
 
 ## 📋 Prerequisitos

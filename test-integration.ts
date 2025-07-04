@@ -14,9 +14,9 @@ console.log("🧪 Test de integración: Verificando módulos internos del proyec
 // 1. Test del Cache interno
 console.log("\n💾 Probando MemoryCache interno...");
 const cacheConfig = {
-  ttl: 300000, // 5 minutos
+  defaultTTL: 300000, // 5 minutos
   maxSize: 100,
-  enabled: true
+  cleanupInterval: 60000 // 1 minuto
 };
 
 const cache = new MemoryCache(cacheConfig);

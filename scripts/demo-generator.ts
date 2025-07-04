@@ -156,14 +156,14 @@ const oracleTypeMap: Record<string, string> = {
 interface ColumnInfo {
   COLUMN_NAME: string;
   DATA_TYPE: string;
-  DATA_LENGTH?: number;
-  DATA_PRECISION?: number;
-  DATA_SCALE?: number;
+  DATA_LENGTH?: number | null;
+  DATA_PRECISION?: number | null;
+  DATA_SCALE?: number | null;
   NULLABLE: string;
-  DATA_DEFAULT?: string;
+  DATA_DEFAULT?: string | null;
   COLUMN_ID: number;
-  CONSTRAINT_TYPE?: string;
-  CONSTRAINT_NAME?: string;
+  CONSTRAINT_TYPE?: string | null;
+  CONSTRAINT_NAME?: string | null;
   IS_PRIMARY_KEY: string;
 }
 
@@ -257,7 +257,7 @@ function generateFieldConfig(
 
 // Función para generar filtros
 function generateCommonFilters(columns: ColumnInfo[]) {
-  const filters: Record<string, any> = {};
+  const filters: Record<string, unknown> = {};
 
   // Buscar campos de estado activo/inactivo
   const statusField = columns.find(col => 
@@ -299,10 +299,10 @@ function generateCommonFilters(columns: ColumnInfo[]) {
 
 // Función para generar validaciones
 function generateCommonValidations(columns: ColumnInfo[]) {
-  const validations: Record<string, any> = {};
+  const validations: Record<string, unknown> = {};
 
   columns.forEach(column => {
-    const validation: any = {};
+    const validation: Record<string, unknown> = {};
 
     // Validación de requerido
     if (column.NULLABLE === 'N' && column.IS_PRIMARY_KEY !== 'YES') {
@@ -331,7 +331,7 @@ function generateCommonValidations(columns: ColumnInfo[]) {
 
 // Función para generar acciones personalizadas
 function generateCommonActions(columns: ColumnInfo[], tableName: string) {
-  const actions: Record<string, any> = {};
+  const actions: Record<string, unknown> = {};
 
   // Buscar campos de estado para generar acciones toggle
   const statusField = columns.find(col => 

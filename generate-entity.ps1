@@ -143,9 +143,17 @@ function Invoke-EntityGenerator {
         $arguments += $EntityName
     }
     
-    # Agregar flag --silent si se va a guardar en archivo o agregar a entities.json
+    # Agregar flags según las opciones
     if ($Archivo -or $Agregar) {
         $arguments += "--silent"
+    }
+    
+    if ($Agregar) {
+        $arguments += "--add-to-entities"
+    }
+    
+    if ($Archivo) {
+        $arguments += "--save-file=$Archivo"
     }
 
     Write-Host "🔄 Ejecutando generador..." -ForegroundColor $Color.Info
@@ -168,57 +176,6 @@ function Invoke-EntityGenerator {
     catch {
         Write-Host "❌ Error ejecutando el generador: $($_.Exception.Message)" -ForegroundColor $Color.Error
         return $null
-    }
-}
-
-function Save-Configuration {
-    param(
-        [string]$Configuration,
-        [string]$OutputFile
-    )
-
-    try {
-        $Configuration | Out-File -FilePath $OutputFile -Encoding UTF8
-        Write-Host "💾 Configuración guardada en: $OutputFile" -ForegroundColor $Color.Success
-    }
-    catch {
-        Write-Host "❌ Error guardando archivo: $($_.Exception.Message)" -ForegroundColor $Color.Error
-    }
-}
-
-function Add-ToEntitiesFile {
-    param(
-        [string]$Configuration,
-        [string]$EntityName
-    )
-
-    $entitiesFile = "config/entities.json"
-    
-    if (-not (Test-Path $entitiesFile)) {
-        Write-Host "❌ Archivo $entitiesFile no encontrado" -ForegroundColor $Color.Error
-        return
-    }
-
-    try {
-        # Leer el archivo actual
-        $currentContent = Get-Content $entitiesFile -Raw | ConvertFrom-Json
-        
-        # Parsear la nueva configuración
-        $newEntity = $Configuration | ConvertFrom-Json
-        
-        # Agregar la nueva entidad
-        foreach ($key in $newEntity.PSObject.Properties.Name) {
-            $currentContent.entities | Add-Member -Name $key -Value $newEntity.$key -MemberType NoteProperty -Force
-        }
-        
-        # Guardar el archivo actualizado
-        $currentContent | ConvertTo-Json -Depth 10 | Out-File $entitiesFile -Encoding UTF8
-        
-        Write-Host "✅ Entidad agregada a $entitiesFile" -ForegroundColor $Color.Success
-        Write-Host "🔄 Reinicia el servidor para aplicar los cambios" -ForegroundColor $Color.Warning
-    }
-    catch {
-        Write-Host "❌ Error agregando entidad: $($_.Exception.Message)" -ForegroundColor $Color.Error
     }
 }
 
@@ -264,58 +221,10 @@ function Main {
         return
     }
 
-    # Extraer solo la parte JSON de la salida
-    $lines = $configuration -split "`n"
-    $jsonStartIndex = -1
-    
-    # Buscar el inicio del JSON (línea con solo "{")
-    for ($i = 0; $i -lt $lines.Length; $i++) {
-        if ($lines[$i].Trim() -eq "{") {
-            $jsonStartIndex = $i
-            break
-        }
-    }
-    
-    if ($jsonStartIndex -ge 0) {
-        $jsonContent = $lines[$jsonStartIndex..($lines.Length - 1)] -join "`n"
-        
-        # Encontrar el final del JSON
-        $jsonLines = $jsonContent -split "`n"
-        $finalJsonLines = @()
-        $braceCount = 0
-        
-        foreach ($line in $jsonLines) {
-            # Contar llaves abiertas y cerradas en la línea
-            $openBraces = ($line.ToCharArray() | Where-Object { $_ -eq '{' }).Count
-            $closeBraces = ($line.ToCharArray() | Where-Object { $_ -eq '}' }).Count
-            
-            $braceCount += $openBraces - $closeBraces
-            $finalJsonLines += $line
-            
-            # Si braceCount llega a 0, hemos terminado el JSON
-            if ($braceCount -eq 0) {
-                break
-            }
-        }
-        
-        
-        # Guardar en archivo si se especifica
-        if ($Archivo) {
-            Save-Configuration -Configuration $jsonContent -OutputFile $Archivo
-        }
-        
-        # Agregar a entities.json si se especifica
-        if ($Agregar) {
-            Add-ToEntitiesFile -Configuration $jsonContent -EntityName ($Entidad -or $Tabla)
-        }
-        
-        if (-not $Archivo -and -not $Agregar) {
-            Write-Host "📋 Configuración generada:" -ForegroundColor $Color.Success
-            Write-Host $jsonContent -ForegroundColor White
-        }
-    }
-    else {
-        Write-Host "❌ No se pudo extraer la configuración JSON" -ForegroundColor $Color.Error
+    # Si no se especificó archivo ni agregar, mostrar el resultado
+    if (-not $Archivo -and -not $Agregar) {
+        Write-Host "📋 Configuración generada:" -ForegroundColor $Color.Success
+        Write-Host $configuration -ForegroundColor White
     }
 }
 

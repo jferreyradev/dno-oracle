@@ -7,7 +7,7 @@ import { oracledb } from "../../deps.ts";
 
 export interface QueryRequest {
   sql: string;
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
   options?: {
     maxRows?: number;
     outFormat?: string;
@@ -17,8 +17,8 @@ export interface QueryRequest {
 
 export interface QueryResponse {
   success: boolean;
-  data?: any[];
-  metaData?: any[];
+  data?: unknown[];
+  metaData?: unknown[];
   rowsAffected?: number;
   executionTime?: number;
   query?: string;
@@ -27,13 +27,13 @@ export interface QueryResponse {
 
 // Interfaz para el resultado de Oracle
 interface OracleResult {
-  rows?: any[];
-  metaData?: any[];
+  rows?: unknown[];
+  metaData?: unknown[];
   rowsAffected?: number;
   lastRowid?: string;
-  outBinds?: any;
+  outBinds?: unknown;
   query?: string;
-  binds?: any;
+  binds?: unknown;
   executedAt?: Date;
 }
 
@@ -207,7 +207,7 @@ export class QueryController {
   /**
    * Valida la sintaxis de una consulta SQL sin ejecutarla
    */
-  async validateQuery(queryRequest: QueryRequest): Promise<QueryResponse> {
+  validateQuery(queryRequest: QueryRequest): QueryResponse {
     const startTime = Date.now();
     
     try {

@@ -9,6 +9,42 @@ import { oracledb, load } from "../deps.ts";
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 oracledb.fetchAsString = [oracledb.CLOB]; // Convertir CLOBs a strings automáticamente
 
+/**
+ * Mapea direcciones de parámetros de cadena a constantes de oracledb
+ */
+function mapBindDirection(dir) {
+  if (typeof dir === 'number') return dir; // Ya es una constante
+  
+  const dirMap = {
+    'IN': oracledb.BIND_IN,
+    'OUT': oracledb.BIND_OUT,
+    'IN_OUT': oracledb.BIND_INOUT,
+    'INOUT': oracledb.BIND_INOUT
+  };
+  
+  return dirMap[dir] || oracledb.BIND_IN;
+}
+
+/**
+ * Mapea tipos de datos de cadena a constantes de oracledb
+ */
+function mapBindType(type) {
+  if (typeof type === 'number') return type; // Ya es una constante
+  if (!type) return oracledb.STRING; // Default
+  
+  const typeMap = {
+    'STRING': oracledb.STRING,
+    'NUMBER': oracledb.NUMBER,
+    'DATE': oracledb.DATE,
+    'TIMESTAMP': oracledb.TIMESTAMP,
+    'CLOB': oracledb.CLOB,
+    'BLOB': oracledb.BLOB,
+    'RAW': oracledb.RAW
+  };
+  
+  return typeMap[type] || oracledb.STRING;
+}
+
 // Variables de entorno
 const env = await load();
 
@@ -352,7 +388,14 @@ async function callProcedure(procedureName, params = {}, opts = {}) {
   for (const [key, value] of Object.entries(params)) {
     if (typeof value === 'object' && value !== null && value.dir) {
       // Parámetro con dirección específica (IN, OUT, IN_OUT)
-      binds[key] = value;
+      const mappedDir = mapBindDirection(value.dir);
+      const mappedType = mapBindType(value.type);
+      
+      binds[key] = {
+        ...value,
+        dir: mappedDir,
+        type: mappedType
+      };
     } else {
       // Parámetro de entrada simple
       binds[key] = {
@@ -572,17 +615,15 @@ async function callProcedureWithCursor(procedureName, params = {}, opts = {}) {
   }
 }
 
-// Manejo de cierre limpio del proceso
-process.on('SIGINT', async () => {
+// Manejo de cierre limpio del proceso para Deno
+globalThis.addEventListener("beforeunload", async () => {
   console.log('Cerrando conexiones...');
   await close();
-  process.exit(0);
 });
 
-process.on('SIGTERM', async () => {
+globalThis.addEventListener("unload", async () => {
   console.log('Cerrando conexiones...');
   await close();
-  process.exit(0);
 });
 
 /**
