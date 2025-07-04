@@ -39,8 +39,14 @@
           "displayName": "Mostrar",
           "description": "Indica si el proceso debe mostrarse (0=No, 1=Sí)",
           "values": [
-            { "value": 0, "label": "No mostrar" },
-            { "value": 1, "label": "Mostrar" }
+            {
+              "value": 0,
+              "label": "No mostrar"
+            },
+            {
+              "value": 1,
+              "label": "Mostrar"
+            }
           ]
         }
       },
@@ -76,7 +82,10 @@
           "message": "Las observaciones no pueden exceder 512 caracteres"
         },
         "MOSTRAR": {
-          "allowedValues": [0, 1],
+          "allowedValues": [
+            0,
+            1
+          ],
           "message": "El campo MOSTRAR debe ser 0 o 1"
         }
       },
@@ -157,8 +166,14 @@
           "displayName": "Activo",
           "description": "Estado del usuario (0=Inactivo, 1=Activo)",
           "values": [
-            { "value": 0, "label": "Inactivo" },
-            { "value": 1, "label": "Activo" }
+            {
+              "value": 0,
+              "label": "Inactivo"
+            },
+            {
+              "value": 1,
+              "label": "Activo"
+            }
           ]
         },
         "CREATED_AT": {
@@ -223,11 +238,18 @@
           "message": "El nombre completo no puede exceder 100 caracteres"
         },
         "IS_ACTIVE": {
-          "allowedValues": [0, 1],
+          "allowedValues": [
+            0,
+            1
+          ],
           "message": "El estado debe ser 0 o 1"
         },
         "ROLE": {
-          "allowedValues": ["admin", "user", "viewer"],
+          "allowedValues": [
+            "admin",
+            "user",
+            "viewer"
+          ],
           "message": "El rol debe ser admin, user o viewer"
         }
       },
@@ -280,10 +302,22 @@
           "displayName": "Nivel",
           "description": "Nivel del log",
           "values": [
-            { "value": "ERROR", "label": "Error" },
-            { "value": "WARN", "label": "Advertencia" },
-            { "value": "INFO", "label": "Información" },
-            { "value": "DEBUG", "label": "Debug" }
+            {
+              "value": "ERROR",
+              "label": "Error"
+            },
+            {
+              "value": "WARN",
+              "label": "Advertencia"
+            },
+            {
+              "value": "INFO",
+              "label": "Información"
+            },
+            {
+              "value": "DEBUG",
+              "label": "Debug"
+            }
           ]
         },
         "MESSAGE": {
@@ -372,7 +406,10 @@
         "warnings": {
           "field": "LOG_LEVEL",
           "operator": "IN",
-          "value": ["ERROR", "WARN"],
+          "value": [
+            "ERROR",
+            "WARN"
+          ],
           "displayName": "Errores y advertencias"
         },
         "today": {
@@ -385,7 +422,12 @@
       "validations": {
         "LOG_LEVEL": {
           "required": true,
-          "allowedValues": ["ERROR", "WARN", "INFO", "DEBUG"],
+          "allowedValues": [
+            "ERROR",
+            "WARN",
+            "INFO",
+            "DEBUG"
+          ],
           "message": "El nivel debe ser ERROR, WARN, INFO o DEBUG"
         },
         "MESSAGE": {
@@ -396,6 +438,109 @@
           "required": true,
           "maxLength": 50,
           "message": "El módulo es requerido y no puede exceder 50 caracteres"
+        }
+      }
+    },
+    "workflow_proc_cab": {
+      "tableName": "WORKFLOW.PROC_CAB",
+      "primaryKey": "ID_PROC_CAB",
+      "autoIncrement": false,
+      "displayName": "Workflow.Proc Cab",
+      "description": "Tabla Workflow.Proc Cab",
+      "fields": {
+        "ID_PROC_CAB": {
+          "type": "NUMBER",
+          "required": true,
+          "displayName": "Id Proc Cab",
+          "description": "Campo Id Proc Cab",
+          "primaryKey": true
+        },
+        "DESCRIPCION": {
+          "type": "VARCHAR2",
+          "required": false,
+          "displayName": "Descripcion",
+          "description": "Campo Descripcion",
+          "length": 100,
+          "searchable": true
+        },
+        "OBSERVACIONES": {
+          "type": "VARCHAR2",
+          "required": false,
+          "displayName": "Observaciones",
+          "description": "Campo Observaciones",
+          "length": 512,
+          "searchable": true
+        },
+        "MOSTRAR": {
+          "type": "NUMBER",
+          "required": true,
+          "displayName": "Mostrar",
+          "description": "Campo Mostrar",
+          "default": "0"
+        }
+      },
+      "operations": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true,
+        "search": true,
+        "paginate": true
+      },
+      "filters": {
+        "active": {
+          "field": "MOSTRAR",
+          "operator": "=",
+          "value": 1,
+          "displayName": "Solo activos"
+        },
+        "inactive": {
+          "field": "MOSTRAR",
+          "operator": "=",
+          "value": 0,
+          "displayName": "Solo inactivos"
+        }
+      },
+      "validations": {
+        "ID_PROC_CAB": {
+          "required": true,
+          "message": "Validaci├│n para Id Proc Cab"
+        },
+        "DESCRIPCION": {
+          "maxLength": 100,
+          "message": "Validaci├│n para Descripcion"
+        },
+        "OBSERVACIONES": {
+          "maxLength": 512,
+          "message": "Validaci├│n para Observaciones"
+        },
+        "MOSTRAR": {
+          "required": true,
+          "allowedValues": [
+            0,
+            1
+          ],
+          "message": "Validaci├│n para Mostrar"
+        }
+      },
+      "customActions": {
+        "toggle-mostrar": {
+          "type": "UPDATE",
+          "sql": "UPDATE WORKFLOW.PROC_CAB SET MOSTRAR = CASE WHEN MOSTRAR = 1 THEN 0 ELSE 1 END WHERE ID_PROC_CAB = :id",
+          "displayName": "Cambiar Mostrar",
+          "description": "Cambia el estado de Mostrar"
+        },
+        "activate": {
+          "type": "UPDATE",
+          "sql": "UPDATE WORKFLOW.PROC_CAB SET MOSTRAR = 1 WHERE ID_PROC_CAB = :id",
+          "displayName": "Activar",
+          "description": "Activa el registro"
+        },
+        "deactivate": {
+          "type": "UPDATE",
+          "sql": "UPDATE WORKFLOW.PROC_CAB SET MOSTRAR = 0 WHERE ID_PROC_CAB = :id",
+          "displayName": "Desactivar",
+          "description": "Desactiva el registro"
         }
       }
     }
@@ -425,9 +570,20 @@
     },
     "cors": {
       "enabled": true,
-      "origins": ["*"],
-      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      "headers": ["Content-Type", "Authorization"]
+      "origins": [
+        "*"
+      ],
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS"
+      ],
+      "headers": [
+        "Content-Type",
+        "Authorization"
+      ]
     }
   }
 }
