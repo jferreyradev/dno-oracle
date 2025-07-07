@@ -381,19 +381,154 @@ const response = await fetch('http://localhost:8000/api/query/select', {
 
 ### Agregar Nueva Entidad
 
-1. Edita `config/entities.json`
-2. Reinicia el servidor
-3. ¡Los endpoints están listos!
+#### **Método 1: Script Automático (Recomendado)**
+
+Usa el script interactivo para agregar entidades rápidamente:
+
+```bash
+# Ejecutar script de agregado de entidades
+deno run --allow-read --allow-write add-entity.ts
+
+# Opciones disponibles:
+# 1. usuarios - Plantilla de usuarios
+# 2. productos - Plantilla de productos  
+# 3. personalizada - Plantilla personalizable
+```
+
+#### **Método 2: Manual**
+
+1. **Edita `config/entities.json`**
+2. **Agrega tu nueva entidad:**
+
+```json
+{
+  "entities": {
+    "mi_entidad": {
+      "tableName": "SCHEMA.MI_TABLA",
+      "primaryKey": "ID",
+      "autoIncrement": true,
+      "displayName": "Mi Entidad",
+      "description": "Descripción de mi entidad",
+      "fields": {
+        "ID": {
+          "type": "NUMBER",
+          "primaryKey": true,
+          "autoIncrement": true,
+          "readonly": true
+        },
+        "NOMBRE": {
+          "type": "VARCHAR2",
+          "length": 100,
+          "required": true,
+          "searchable": true
+        }
+      },
+      "operations": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true
+      }
+    }
+  }
+}
+```
+
+3. **Reinicia el servidor**
+4. **¡Los endpoints están listos!**
+
+#### **Método 3: Generación desde Base de Datos (Avanzado)**
+
+Para generar entidades automáticamente desde tablas existentes:
+
+```bash
+# Generar entidad desde tabla Oracle existente
+deno run --allow-net --allow-read --allow-write --allow-env --allow-ffi generate-entity.ts
+
+# El script te pedirá:
+# - Nombre de la tabla Oracle
+# - Nombre de la entidad
+# - Confirmación para generar
+```
 
 ### Personalizar Validaciones
 
-1. Define reglas en `validations`
-2. El sistema valida automáticamente
+Define reglas de validación en tu entidad:
 
-### Agregar Filtros
+```json
+{
+  "validations": {
+    "EMAIL": {
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "message": "El formato del email no es válido"
+    },
+    "PRECIO": {
+      "pattern": "^[0-9]+(\\.[0-9]{1,2})?$",
+      "message": "El precio debe ser un número válido"
+    }
+  }
+}
+```
 
-1. Define filtros en `filters`
-2. Usa con `?filter_nombre=valor`
+### Agregar Filtros Personalizados
+
+Crea filtros reutilizables:
+
+```json
+{
+  "filters": {
+    "activos": {
+      "condition": "ACTIVO = 1",
+      "description": "Solo registros activos"
+    },
+    "por_nombre": {
+      "condition": "UPPER(NOMBRE) LIKE UPPER('%' || :nombre || '%')",
+      "description": "Buscar por nombre"
+    },
+    "rango_fechas": {
+      "condition": "FECHA BETWEEN :fecha_inicio AND :fecha_fin",
+      "description": "Filtrar por rango de fechas"
+    }
+  }
+}
+```
+
+Uso: `GET /api/mi_entidad?filter_activos=true&nombre=Juan`
+
+### Tipos de Campos Soportados
+
+| Tipo Oracle | Configuración | Ejemplo |
+|-------------|---------------|---------|
+| `NUMBER` | `{"type": "NUMBER"}` | IDs, cantidades |
+| `VARCHAR2` | `{"type": "VARCHAR2", "length": 100}` | Textos |
+| `DATE` | `{"type": "DATE"}` | Fechas |
+| `TIMESTAMP` | `{"type": "TIMESTAMP"}` | Fechas con hora |
+| `INTEGER` | `{"type": "INTEGER"}` | Enteros |
+| `CLOB` | `{"type": "CLOB"}` | Textos largos |
+
+### Propiedades de Campo
+
+```json
+{
+  "MI_CAMPO": {
+    "type": "VARCHAR2",
+    "length": 100,
+    "required": true,           // Campo obligatorio
+    "primaryKey": true,         // Clave primaria
+    "autoIncrement": true,      // Auto incremento
+    "readonly": true,           // Solo lectura
+    "searchable": true,         // Incluir en búsquedas
+    "unique": true,             // Valor único
+    "default": "valor",         // Valor por defecto
+    "displayName": "Mi Campo",  // Nombre para mostrar
+    "description": "Descripción del campo",
+    "values": [                 // Valores permitidos
+      {"value": 1, "label": "Activo"},
+      {"value": 0, "label": "Inactivo"}
+    ]
+  }
+}
+```
 
 ## 📞 Soporte y Documentación
 
@@ -404,12 +539,67 @@ const response = await fetch('http://localhost:8000/api/query/select', {
 
 ## 🚀 Próximas Mejoras
 
-- [ ] Interface web de administración
+- [x] **Interface web de administración** ✅ ¡Implementada!
+- [x] **Importación de archivos CSV** ✅ ¡Implementada!
+- [x] **Gestión de tablas y datos** ✅ ¡Implementada!
 - [ ] Exportación a Excel/CSV
 - [ ] Soft deletes configurables
 - [ ] Relaciones entre entidades (JOINs)
 - [ ] Webhooks de eventos
 - [ ] API de métricas (Prometheus)
+
+## 🌐 Interfaz Web
+
+El sistema incluye una **interfaz web moderna y completa** disponible en `http://localhost:8000` con las siguientes funcionalidades:
+
+### ✨ Características de la Interfaz Web
+
+- 🎨 **Diseño moderno y responsivo** - Compatible con escritorio y móviles
+- 📁 **Importación de archivos CSV** - Drag & drop con validación automática
+- 🗄️ **Gestión de tablas** - Visualización y administración de datos
+- 💻 **Editor SQL** - Ejecutar consultas personalizadas con sintaxis highlighting
+- 🔧 **Gestión de procedimientos** - Ejecutar procedimientos almacenados
+- 📊 **Visualización de datos** - Tablas dinámicas con datos en tiempo real
+- 🔍 **Exploración de esquemas** - Ver columnas y metadatos de tablas
+
+### 🚀 Cómo Usar la Interfaz Web
+
+1. **Iniciar el servidor**:
+   ```bash
+   .\run-enhanced.ps1
+   ```
+
+2. **Abrir el navegador**:
+   ```
+   http://localhost:8000
+   ```
+
+3. **Funcionalidades disponibles**:
+   - **Importar CSV**: Arrastra archivos CSV para importarlos automáticamente
+   - **Gestión de Tablas**: Ve y administra datos de las entidades configuradas
+   - **Consultas SQL**: Ejecuta consultas personalizadas con editor integrado
+   - **Procedimientos**: Ejecuta procedimientos almacenados con parámetros
+
+### 📱 Screenshots de la Interfaz
+
+La interfaz incluye:
+- Dashboard principal con navegación por pestañas
+- Sistema de importación de archivos con mapeo automático
+- Visualizador de datos con tablas paginadas
+- Editor SQL con validación de sintaxis
+- Sistema de notificaciones para feedback del usuario
+
+### 🔧 Inicio Rápido con Interfaz Web
+
+```bash
+# 1. Configurar .env con datos de Oracle
+# 2. Configurar entities.json con tus tablas  
+# 3. Iniciar el servidor
+.\start-web-interface.ps1
+
+# La interfaz estará disponible en:
+# http://localhost:8000
+```
 
 ---
 

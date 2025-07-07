@@ -16,6 +16,50 @@ export class QueryRouter {
   }
 
   private setupRoutes() {
+    // POST /api/query - Ejecutar cualquier consulta SQL (ruta genérica)
+    this.router.post('/api/query', async (ctx) => {
+      try {
+        const body = await ctx.request.body({ type: 'json' }).value as QueryRequest;
+        
+        if (!body.sql) {
+          ctx.response.status = 400;
+          ctx.response.body = {
+            success: false,
+            error: 'El campo sql es requerido'
+          };
+          return;
+        }
+
+        // Determinar el tipo de consulta y ejecutar el método apropiado
+        const sql = body.sql.trim().toUpperCase();
+        let result;
+        
+        if (sql.startsWith('SELECT') || sql.startsWith('WITH')) {
+          result = await this.queryController.executeSelect(body);
+        } else if (sql.startsWith('INSERT') || sql.startsWith('UPDATE') || sql.startsWith('DELETE') || sql.startsWith('MERGE')) {
+          result = await this.queryController.executeModification(body);
+        } else {
+          ctx.response.status = 400;
+          ctx.response.body = {
+            success: false,
+            error: 'Tipo de consulta no soportado. Use SELECT, INSERT, UPDATE, DELETE o MERGE'
+          };
+          return;
+        }
+        
+        ctx.response.status = result.success ? 200 : 400;
+        ctx.response.body = result;
+
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error interno del servidor';
+        ctx.response.status = 500;
+        ctx.response.body = {
+          success: false,
+          error: errorMessage
+        };
+      }
+    });
+
     // POST /api/query/select - Ejecutar consulta SELECT
     this.router.post('/api/query/select', async (ctx) => {
       try {

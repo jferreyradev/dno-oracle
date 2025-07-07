@@ -115,16 +115,23 @@ class GenericApiServer {
             procedures: true,
             fileImport: true
           },
-          entities: entities.map(name => ({
-            name,
-            endpoints: [
-              `GET /api/${name}`,
-              `GET /api/${name}/:id`,
-              `POST /api/${name}`,
-              `PUT /api/${name}/:id`,
-              `DELETE /api/${name}/:id`
-            ]
-          })),
+          entities: entities.map(name => {
+            const entityConfig = config.entities[name];
+            return {
+              name,
+              tableName: entityConfig.tableName,
+              displayName: entityConfig.displayName,
+              description: entityConfig.description,
+              primaryKey: entityConfig.primaryKey,
+              endpoints: [
+                `GET /api/${name}`,
+                `GET /api/${name}/:id`,
+                `POST /api/${name}`,
+                `PUT /api/${name}/:id`,
+                `DELETE /api/${name}/:id`
+              ]
+            };
+          }),
           cache: this.cache ? {
             stats: this.cache.getStats(),
             endpoints: [
@@ -235,6 +242,61 @@ class GenericApiServer {
     this.app.use(fileImportRouter.routes());
     this.app.use(fileImportRouter.allowedMethods());
     console.log(`✅ Rutas de importación de archivos registradas`);
+
+    // Servir archivos estáticos
+    this.app.use(async (ctx, next) => {
+      // Si es una ruta de API, continuar con el siguiente middleware
+      if (ctx.request.url.pathname.startsWith('/api/')) {
+        await next();
+        return;
+      }
+      
+      try {
+        // Servir archivos estáticos desde la carpeta public
+        const filePath = ctx.request.url.pathname === '/' ? '/index.html' : ctx.request.url.pathname;
+        const fullPath = `${Deno.cwd()}/public${filePath}`;
+        
+        // Verificar si el archivo existe
+        const fileInfo = await Deno.stat(fullPath);
+        if (fileInfo.isFile) {
+          const content = await Deno.readFile(fullPath);
+          
+          // Determinar el tipo de contenido
+          const ext = filePath.split('.').pop()?.toLowerCase();
+          const mimeTypes: Record<string, string> = {
+            'html': 'text/html',
+            'css': 'text/css',
+            'js': 'application/javascript',
+            'json': 'application/json',
+            'png': 'image/png',
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'gif': 'image/gif',
+            'svg': 'image/svg+xml',
+            'ico': 'image/x-icon'
+          };
+          
+          ctx.response.headers.set('Content-Type', mimeTypes[ext || ''] || 'text/plain');
+          ctx.response.body = content;
+          return;
+        }
+      } catch (_error) {
+        // Si no se encuentra el archivo, intentar servir index.html (SPA)
+        if (ctx.request.url.pathname !== '/') {
+          try {
+            const indexPath = `${Deno.cwd()}/public/index.html`;
+            const content = await Deno.readFile(indexPath);
+            ctx.response.headers.set('Content-Type', 'text/html');
+            ctx.response.body = content;
+            return;
+          } catch {
+            // Si no se puede servir index.html, continuar con 404
+          }
+        }
+      }
+      
+      await next();
+    });
 
     // Registrar rutas en la aplicación
     this.app.use(this.router.routes());

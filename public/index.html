@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNO-Oracle - Gestión de Datos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗄️</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🗄️ DNO-Oracle</h1>
+                <p>Sistema de Gestión de Datos Oracle</p>
+            </div>
+            <div class="header-actions">
+                <button id="health-check-btn" class="btn btn-outline">
+                    <span class="btn-icon">💚</span>
+                    Health Check
+                </button>
+                <button id="api-info-btn" class="btn btn-outline">
+                    <span class="btn-icon">📋</span>
+                    API Info
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <button class="nav-btn active" data-tab="import">
+                <span class="nav-icon">📤</span>
+                Importar Archivos
+            </button>
+            <button class="nav-btn" data-tab="tables">
+                <span class="nav-icon">🗂️</span>
+                Gestionar Tablas
+            </button>
+            <button class="nav-btn" data-tab="queries">
+                <span class="nav-icon">🔍</span>
+                Consultas SQL
+            </button>
+            <button class="nav-btn" data-tab="procedures">
+                <span class="nav-icon">⚙️</span>
+                Procedimientos
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Import Tab -->
+            <div id="import-tab" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📤 Importar Archivo CSV</h2>
+                        <p>Selecciona un archivo CSV para importar a una tabla Oracle</p>
+                    </div>
+                    <div class="card-body">
+                        <!-- File Upload -->
+                        <div class="upload-section">
+                            <div class="upload-area" id="upload-area">
+                                <div class="upload-icon">📁</div>
+                                <div class="upload-text">
+                                    <h3>Arrastra tu archivo CSV aquí</h3>
+                                    <p>o haz clic para seleccionar</p>
+                                </div>
+                                <input type="file" id="file-input" accept=".csv" style="display: none;">
+                            </div>
+                            <div class="file-info" id="file-info" style="display: none;">
+                                <div class="file-details">
+                                    <span class="file-name"></span>
+                                    <span class="file-size"></span>
+                                </div>
+                                <button class="btn btn-sm btn-outline" id="remove-file-btn">❌ Quitar</button>
+                            </div>
+                        </div>
+
+                        <!-- Configuration -->
+                        <div class="config-section" id="config-section" style="display: none;">
+                            <h3>⚙️ Configuración de Importación</h3>
+                            
+                            <div class="form-group">
+                                <label for="table-select">Tabla de destino:</label>
+                                <select id="table-select" class="form-control">
+                                    <option value="">Selecciona una tabla...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-options">
+                                <div class="checkbox-group">
+                                    <label>
+                                        <input type="checkbox" id="skip-first-row" checked>
+                                        Omitir primera fila (headers)
+                                    </label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <label>
+                                        <input type="checkbox" id="validate-only">
+                                        Solo validar (no importar)
+                                    </label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <label>
+                                        <input type="checkbox" id="truncate-table">
+                                        Vaciar tabla antes de importar
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="batch-size">Tamaño de lote:</label>
+                                <input type="number" id="batch-size" class="form-control" value="1000" min="1" max="10000">
+                            </div>
+                        </div>
+
+                        <!-- Column Mapping -->
+                        <div class="mapping-section" id="mapping-section" style="display: none;">
+                            <h3>🔗 Mapeo de Columnas</h3>
+                            <div class="mapping-container" id="mapping-container">
+                                <!-- Mappings will be populated here -->
+                            </div>
+                            <button class="btn btn-outline" id="auto-map-btn">
+                                <span class="btn-icon">🤖</span>
+                                Mapeo Automático
+                            </button>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="actions" id="import-actions" style="display: none;">
+                            <button class="btn btn-primary" id="import-btn">
+                                <span class="btn-icon">🚀</span>
+                                Importar Datos
+                            </button>
+                            <button class="btn btn-outline" id="preview-btn">
+                                <span class="btn-icon">👁️</span>
+                                Vista Previa
+                            </button>
+                            <button class="btn btn-outline" id="validate-btn">
+                                <span class="btn-icon">✅</span>
+                                Validar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="card" id="results-card" style="display: none;">
+                    <div class="card-header">
+                        <h2>📊 Resultados</h2>
+                    </div>
+                    <div class="card-body">
+                        <div id="results-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables Tab -->
+            <div id="tables-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🗂️ Gestión de Tablas</h2>
+                        <div class="card-actions">
+                            <button class="btn btn-outline" id="refresh-tables-btn">
+                                <span class="btn-icon">🔄</span>
+                                Actualizar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-section">
+                            <div class="search-container">
+                                <input type="text" id="table-search" class="search-input" placeholder="🔍 Buscar tabla...">
+                            </div>
+                        </div>
+                        <div class="tables-grid" id="tables-grid">
+                            <!-- Tables will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Queries Tab -->
+            <div id="queries-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🔍 Consultas SQL</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="query-editor">
+                            <textarea id="sql-editor" class="sql-textarea" placeholder="Escribe tu consulta SQL aquí..."></textarea>
+                        </div>
+                        <div class="query-actions">
+                            <button class="btn btn-primary" id="execute-query-btn">
+                                <span class="btn-icon">▶️</span>
+                                Ejecutar
+                            </button>
+                            <button class="btn btn-outline" id="explain-query-btn">
+                                <span class="btn-icon">📋</span>
+                                Explicar
+                            </button>
+                            <button class="btn btn-outline" id="validate-query-btn">
+                                <span class="btn-icon">✅</span>
+                                Validar
+                            </button>
+                        </div>
+                        <div class="query-results" id="query-results"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Procedures Tab -->
+            <div id="procedures-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>⚙️ Procedimientos Almacenados</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="procedure-section">
+                            <div class="form-group">
+                                <label for="procedure-name">Nombre del procedimiento:</label>
+                                <input type="text" id="procedure-name" class="form-control" placeholder="Ej: MI_SCHEMA.MI_PROCEDIMIENTO">
+                            </div>
+                            <div class="form-group">
+                                <label for="procedure-params">Parámetros (JSON):</label>
+                                <textarea id="procedure-params" class="form-control" placeholder='{"param1": "valor1", "param2": "valor2"}'></textarea>
+                            </div>
+                            <div class="procedure-actions">
+                                <button class="btn btn-primary" id="execute-procedure-btn">
+                                    <span class="btn-icon">▶️</span>
+                                    Ejecutar
+                                </button>
+                                <button class="btn btn-outline" id="get-procedure-info-btn">
+                                    <span class="btn-icon">ℹ️</span>
+                                    Información
+                                </button>
+                            </div>
+                        </div>
+                        <div class="procedure-results" id="procedure-results"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Status Bar -->
+        <div class="status-bar" id="status-bar">
+            <div class="status-item">
+                <span class="status-label">Estado:</span>
+                <span class="status-value" id="connection-status">Conectado</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Servidor:</span>
+                <span class="status-value" id="server-url">http://localhost:8000</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Cargando...</div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

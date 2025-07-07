@@ -8,16 +8,32 @@ import { oracledb, load } from '../../deps.ts';
 // Cargar variables de entorno
 await load({ export: true });
 
+// Inicializar Oracle en modo Thick para mayor compatibilidad
+try {
+  const libPath = Deno.env.get('LIB_ORA') || 'C:\\oracle\\instantclient_21_11';
+  oracledb.initOracleClient({ libDir: libPath });
+  console.log('✅ Oracle Client inicializado en modo Thick');
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.warn('⚠️  Oracle Client ya inicializado o modo Thin:', message);
+}
+
 // Configuración de la conexión a Oracle
 const dbConfig = {
-  user: Deno.env.get('ORACLE_USER') || 'hr',
-  password: Deno.env.get('ORACLE_PASSWORD') || 'password',
-  connectString: Deno.env.get('ORACLE_CONNECTION_STRING') || 'localhost:1521/XE',
-  poolMax: 10,
+  user: Deno.env.get('USER') || 'hr',
+  password: Deno.env.get('PASSWORD') || 'password',
+  connectString: Deno.env.get('CONNECTIONSTRING') || 'localhost:1521/XE',
+  poolMax: parseInt(Deno.env.get('POOL') || '10'),
   poolMin: 2,
   poolIncrement: 1,
   poolTimeout: 4
 };
+
+// Debug: Mostrar configuración (sin contraseña)
+console.log('🔧 Configuración de Oracle:');
+console.log(`   Usuario: ${dbConfig.user}`);
+console.log(`   Conexión: ${dbConfig.connectString}`);
+console.log(`   Pool Max: ${dbConfig.poolMax}`);
 
 // Pool de conexiones
 let connectionPool: oracledb.Pool | null = null;

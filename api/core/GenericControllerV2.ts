@@ -566,12 +566,27 @@ export class GenericControllerV2 {
   /**
    * Procesar datos de Oracle para convertir CLOBs a strings
    */
-  private async processOracleData(data: Record<string, unknown>[]): Promise<Record<string, unknown>[]> {
-    if (!data || data.length === 0) return data;
+  private async processOracleData(data: Record<string, unknown>[] | { rows: Record<string, unknown>[] }): Promise<Record<string, unknown>[]> {
+    // Manejar el formato de Oracle que devuelve { rows: [...], metaData: [...] }
+    let actualData: Record<string, unknown>[];
+    
+    if (!data) return [];
+    
+    if (Array.isArray(data)) {
+      actualData = data;
+    } else if (data && typeof data === 'object' && 'rows' in data && Array.isArray(data.rows)) {
+      console.log('📊 Procesando datos de Oracle con formato { rows, metaData }');
+      actualData = data.rows as Record<string, unknown>[];
+    } else {
+      console.warn('⚠️ Datos recibidos en formato inesperado:', typeof data, data);
+      return [];
+    }
+    
+    if (actualData.length === 0) return actualData;
 
     const processedData = [];
     
-    for (const row of data) {
+    for (const row of actualData) {
       const processedRow: Record<string, unknown> = {};
       
       for (const [key, value] of Object.entries(row)) {
