@@ -8,14 +8,16 @@ Sistema de API REST genérica que permite crear automáticamente endpoints CRUD 
 
 - ✅ **CRUD automático** - Create, Read, Update, Delete para cualquier tabla
 - ✅ **Consultas SQL directas** - Ejecutar consultas SQL personalizadas vía API REST
+- ✅ **Importación de archivos** - Subida automática de CSV a tablas Oracle con validación
+- ✅ **Procedimientos almacenados** - Ejecución de procedures y functions de Oracle
+- ✅ **Interfaz web moderna** - Frontend completo con drag & drop y editor SQL
+- ✅ **Modo API-only** - Despliegue solo backend sin archivos estáticos
 - ✅ **Búsqueda y filtros dinámicos** - Búsqueda de texto y filtros configurables
 - ✅ **Paginación automática** - Paginación optimizada para Oracle
 - ✅ **Validaciones configurables** - Validación de datos según reglas definidas
-- ✅ **Acciones personalizadas** - Operaciones SQL customizadas
 - ✅ **Cache inteligente** - Sistema de cache LRU para alto rendimiento
 - ✅ **Métricas y monitoreo** - Estadísticas de rendimiento en tiempo real
 - ✅ **Logging estructurado** - Logs detallados con timestamps
-- ✅ **Preparado para autenticación** - Sistema JWT listo para activar
 
 ## 🎯 Sin Código, Solo Configuración
 
@@ -70,6 +72,40 @@ d:\proyectos\denostuff\dno-oracle\
 └── README.md                        # Esta documentación
 ```
 
+## 🎛️ Modos de Funcionamiento
+
+El servidor puede funcionar en dos modos diferentes:
+
+### 🌐 Modo Completo (Por defecto)
+- **API REST** completa con todos los endpoints
+- **Interfaz web** moderna y responsiva
+- **Editor SQL** integrado con sintaxis highlighting
+- **Gestión de tablas** con vista previa de datos
+- **Importación de archivos** con drag & drop
+- **Gestión de procedimientos** almacenados
+
+```bash
+# Iniciar en modo completo
+.\start-web-enhanced.ps1
+# o
+deno run --allow-all api/server-enhanced.ts
+```
+
+### 🔧 Modo API-Only
+- **Solo endpoints REST** sin interfaz web
+- **Optimizado para backend** y microservicios
+- **Menor uso de recursos** (sin archivos estáticos)
+- **Ideal para contenedores** y despliegues en la nube
+
+```bash
+# Iniciar en modo API-only
+.\start-api-only.ps1
+# o
+$env:API_ONLY="true"; deno run --allow-all api/server-enhanced.ts
+```
+
+En modo API-only, el endpoint raíz `/` devuelve información de la API en lugar de servir la interfaz web.
+
 ## 🚀 Inicio Rápido
 
 ### 1. Configurar Base de Datos
@@ -90,15 +126,33 @@ Edita `config/entities.json` con tus tablas.
 
 ### 3. Iniciar Servidor
 
+Tienes varias opciones para iniciar el servidor:
+
+#### 🌐 Modo Completo (API + Web)
 ```bash
-# PowerShell (Recomendado)
+# Interfaz web completa (recomendado para desarrollo)
+.\start-web-enhanced.ps1
+
+# Con puerto personalizado
+.\start-web-enhanced.ps1 -Port 3000
+```
+
+#### 🔧 Modo API-Only (Solo Backend)
+```bash
+# Solo API REST (ideal para producción)
+.\start-api-only.ps1
+
+# Con puerto personalizado
+$env:PORT="3000"; .\start-api-only.ps1
+```
+
+#### 📜 Scripts Clásicos
+```bash
+# PowerShell (modo completo)
 .\run-enhanced.ps1
 
 # Deno directo
 deno run --allow-net --allow-read --allow-env run-enhanced.ts
-
-# Con puerto personalizado
-.\run-enhanced.ps1 -Puerto 3000
 
 # Ver ayuda
 .\run-enhanced.ps1 -Ayuda
@@ -106,16 +160,28 @@ deno run --allow-net --allow-read --allow-env run-enhanced.ts
 
 ### 4. ¡Listo!
 
-Abre tu navegador en:
+#### 🌐 En Modo Completo
+- **http://localhost:8000/** - Interfaz web completa
 - **http://localhost:8000/api/info** - Documentación automática
 - **http://localhost:8000/api/health** - Estado del sistema
-- **http://localhost:8000/api/{entidad}** - Tu API REST
-- **http://localhost:8000/api/query/info** - 🔥 Servicio de consultas SQL directas
 
-📚 **Guías Rápidas:**
+#### 🔧 En Modo API-Only
+- **http://localhost:8000/** - Información de la API
+- **http://localhost:8000/api/info** - Documentación completa
+- **http://localhost:8000/api/health** - Estado del sistema
+- **http://localhost:8000/api/{entidad}** - Endpoints CRUD
+
+#### 🔥 Funcionalidades Principales
+- **http://localhost:8000/api/query/info** - Consultas SQL directas
+- **http://localhost:8000/api/import/info** - Importación de archivos
+- **http://localhost:8000/api/procedures/help** - Procedimientos almacenados
+
+📚 **Documentación:**
 - **`QUERY-QUICKSTART.md`** - Guía rápida de consultas SQL
-- **`docs/QUERY-EXAMPLES.md`** - Ejemplos completos
-- **`examples/query-api-usage.js`** - Ejemplos ejecutables
+- **`docs/QUERY-EXAMPLES.md`** - Ejemplos de consultas
+- **`docs/FILE-IMPORT-EXAMPLES.md`** - Guía de importación
+- **`docs/WEB-INTERFACE-GUIDE.md`** - Manual de interfaz web
+- **`examples/`** - Ejemplos ejecutables
 
 ## 📋 Endpoints Generados Automáticamente
 
@@ -182,6 +248,117 @@ curl -X POST http://localhost:8000/api/query/explain \
     "sql": "SELECT * FROM ventas WHERE fecha >= :fecha_inicio",
     "params": { "fecha_inicio": "2024-01-01" }
   }'
+```
+
+## 📁 Endpoints de Importación de Archivos
+
+Sistema completo para importar archivos CSV a tablas Oracle con validación automática:
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/api/import/info` | Información del servicio de importación |
+| `POST` | `/api/import/csv` | Importar archivo CSV completo |
+| `POST` | `/api/import/validate` | Validar archivo sin importar |
+| `POST` | `/api/import/headers` | Obtener headers del CSV |
+| `POST` | `/api/import/mapping` | Generar mapeo automático |
+| `GET` | `/api/import/columns/:tableName` | Obtener columnas de tabla |
+
+### Ejemplos de Importación
+
+#### Importación Completa
+```bash
+curl -X POST http://localhost:8000/api/import/csv \
+  -F "file=@datos.csv" \
+  -F "tableName=USUARIOS" \
+  -F "options={\"batchSize\":100,\"skipErrors\":false}"
+```
+
+#### Validación Previa
+```bash
+curl -X POST http://localhost:8000/api/import/validate \
+  -F "file=@datos.csv" \
+  -F "tableName=USUARIOS"
+```
+
+## ⚙️ Endpoints de Procedimientos Almacenados
+
+Ejecución segura de procedures y functions de Oracle:
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/api/procedures/help` | Información y ayuda del servicio |
+| `POST` | `/api/procedures/call` | Ejecutar procedimiento almacenado |
+| `POST` | `/api/procedures/function` | Ejecutar función |
+| `POST` | `/api/procedures/cursor` | Ejecutar procedure que retorna cursor |
+| `GET` | `/api/procedures/list` | Listar procedures disponibles |
+| `GET` | `/api/procedures/info/:name` | Información de un procedure específico |
+
+### Ejemplos de Procedimientos
+
+#### Ejecutar Procedure
+```bash
+curl -X POST http://localhost:8000/api/procedures/call \
+  -H "Content-Type: application/json" \
+  -d '{
+    "procedureName": "actualizar_usuario",
+    "parameters": {
+      "p_id": 123,
+      "p_nombre": "Juan Pérez",
+      "p_email": "juan@ejemplo.com"
+    }
+  }'
+```
+
+#### Ejecutar Function
+```bash
+curl -X POST http://localhost:8000/api/procedures/function \
+  -H "Content-Type: application/json" \
+  -d '{
+    "functionName": "calcular_edad",
+    "parameters": {
+      "p_fecha_nacimiento": "1990-05-15"
+    }
+  }'
+```
+
+## 💾 Endpoints de Gestión de Cache
+
+Sistema de cache LRU para optimizar el rendimiento de consultas:
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/api/cache/stats` | Estadísticas globales del cache |
+| `DELETE` | `/api/cache/clear-all` | Limpiar todo el cache |
+| `GET` | `/api/{entidad}/cache/stats` | Estadísticas por entidad |
+| `DELETE` | `/api/{entidad}/cache/clear` | Limpiar cache de entidad |
+
+### Ejemplos de Cache
+
+#### Ver Estadísticas Globales
+```bash
+curl http://localhost:8000/api/cache/stats
+```
+
+#### Limpiar Cache de Entidad
+```bash
+curl -X DELETE http://localhost:8000/api/usuarios/cache/clear
+```
+
+#### Respuesta de Estadísticas
+```json
+{
+  "success": true,
+  "data": {
+    "size": 150,
+    "maxSize": 2000,
+    "hitRate": 0.85,
+    "hits": 340,
+    "misses": 60,
+    "sets": 200,
+    "deletes": 50
+  },
+  "timestamp": "2024-07-07T10:30:00.000Z"
+}
 ```
 
 ### Respuesta Típica de Consulta
