@@ -3,7 +3,7 @@
  */
 
 import { RouterContext } from 'https://deno.land/x/oak@v12.6.1/mod.ts';
-import * as db from '../../src/db-improved.js';
+import * as db from './DatabaseService.ts';
 
 // Interfaces para los tipos de datos
 interface ProcedureResult {
@@ -377,7 +377,7 @@ export class ProcedureController {
         });
 
         if (sourceResult.length > 0) {
-          sourceCode = sourceResult.map(row => row.TEXT).join('');
+          sourceCode = sourceResult.map((row: Record<string, unknown>) => row.TEXT).join('');
         }
       } catch (sourceError) {
         console.warn('No se pudo obtener el código fuente:', sourceError);

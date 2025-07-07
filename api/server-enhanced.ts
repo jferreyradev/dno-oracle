@@ -9,6 +9,7 @@ import { GenericControllerV2 } from './core/GenericControllerV2.ts';
 import { MemoryCache, type CacheConfig } from './core/CacheService.ts';
 import { AuthService, type AuthConfig } from './core/AuthService.ts';
 import { QueryRouter } from './core/QueryRouter.ts';
+import { ProcedureRouter } from './core/ProcedureRouter.ts';
 import { FileImportRouter } from './core/FileImportRouter.ts';
 
 class GenericApiServer {
@@ -141,6 +142,16 @@ class GenericApiServer {
               'GET /api/import/columns/:tableName'
             ]
           },
+          procedures: {
+            endpoints: [
+              'POST /api/procedures/call',
+              'POST /api/procedures/function',
+              'POST /api/procedures/cursor',
+              'GET /api/procedures/list',
+              'GET /api/procedures/info/:procedureName',
+              'GET /api/procedures/help'
+            ]
+          },
         }
       };
     });
@@ -192,6 +203,12 @@ class GenericApiServer {
     this.app.use(queryRouter.getRouter().routes());
     this.app.use(queryRouter.getRouter().allowedMethods());
     console.log(`✅ Rutas de consultas SQL registradas`);
+
+    // Registrar rutas de procedimientos almacenados
+    const procedureRouter = ProcedureRouter.getRouter();
+    this.app.use(procedureRouter.routes());
+    this.app.use(procedureRouter.allowedMethods());
+    console.log(`✅ Rutas de procedimientos almacenados registradas`);
 
     // Ruta para limpiar todo el cache
     if (this.cache) {

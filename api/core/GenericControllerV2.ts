@@ -7,7 +7,7 @@ import type { EntityConfig } from './EntityConfig.ts';
 import { SqlBuilder, type SearchOptions } from './SqlBuilder.ts';
 import { DataValidator } from './DataValidator.ts';
 import type { MemoryCache } from './CacheService.ts';
-import { querySQL, executeSQL } from '../../src/db-improved.js';
+import { querySQL, executeSQL } from './DatabaseService.ts';
 
 interface PaginatedResponse<T = Record<string, unknown>> {
   data: T[];

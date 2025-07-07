@@ -2,8 +2,7 @@
  * QueryController - Controlador para ejecutar consultas SQL directas
  */
 
-import { exec } from "../../src/db-improved.js";
-import { oracledb } from "../../deps.ts";
+import { querySQL, executeSQL } from "./DatabaseService.ts";
 
 export interface QueryRequest {
   sql: string;
@@ -54,19 +53,10 @@ export class QueryController {
         };
       }
 
-      // Configurar opciones por defecto
-      const options = {
-        outFormat: oracledb.OUT_FORMAT_OBJECT,
-        maxRows: queryRequest.options?.maxRows || 1000,
-        autoCommit: false,
-        ...queryRequest.options
-      };
-
       // Ejecutar la consulta
-      const result = await exec(
+      const result = await querySQL(
         queryRequest.sql,
-        queryRequest.params || {},
-        options
+        queryRequest.params || {}
       ) as OracleResult;
 
       const executionTime = Date.now() - startTime;
@@ -112,18 +102,10 @@ export class QueryController {
         };
       }
 
-      // Configurar opciones por defecto
-      const options = {
-        outFormat: oracledb.OUT_FORMAT_OBJECT,
-        autoCommit: queryRequest.options?.autoCommit !== false, // true por defecto para modificaciones
-        ...queryRequest.options
-      };
-
       // Ejecutar la consulta
-      const result = await exec(
+      const result = await executeSQL(
         queryRequest.sql,
-        queryRequest.params || {},
-        options
+        queryRequest.params || {}
       ) as OracleResult;
 
       const executionTime = Date.now() - startTime;
@@ -170,10 +152,10 @@ export class QueryController {
       const explainSql = `EXPLAIN PLAN FOR ${queryRequest.sql}`;
       
       // Ejecutar EXPLAIN PLAN
-      await exec(explainSql, queryRequest.params || {}) as OracleResult;
+      await executeSQL(explainSql, queryRequest.params || {}) as OracleResult;
       
       // Obtener el plan de ejecución
-      const planResult = await exec(`
+      const planResult = await querySQL(`
         SELECT operation, options, object_name, object_type, cost, cardinality, bytes, 
                cpu_cost, io_cost, time, level
         FROM plan_table 
@@ -286,7 +268,7 @@ export class QueryController {
         WHERE table_name = UPPER(:tableName)
       `;
 
-      const result = await exec(sql, { tableName }) as OracleResult;
+      const result = await querySQL(sql, { tableName }) as OracleResult;
       const executionTime = Date.now() - startTime;
 
       return {
