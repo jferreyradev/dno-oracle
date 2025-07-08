@@ -1,5 +1,0 @@
-# Ignorar archivos del frontend
-public/
-*.js
-*.html
-*.css

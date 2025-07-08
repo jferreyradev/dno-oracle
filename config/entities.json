@@ -6,6 +6,11 @@
       "autoIncrement": true,
       "displayName": "Procesos de Cabecera",
       "description": "Tabla de procesos de cabecera del sistema workflow",
+      "defaultConnection": "prod",
+      "allowedConnections": [
+        "prod",
+        "desa"
+      ],
       "fields": {
         "ID_PROC_CAB": {
           "type": "NUMBER",
@@ -71,6 +76,11 @@
       "autoIncrement": true,
       "displayName": "Tmp Renov Cargo",
       "description": "Tabla temporal de renovación de cargos",
+      "defaultConnection": "prod",
+      "allowedConnections": [
+        "prod",
+        "desa"
+      ],
       "fields": {
         "ID": {
           "type": "NUMBER",
@@ -152,6 +162,47 @@
           "displayName": "Observaciones",
           "description": "Observaciones del registro",
           "searchable": true
+        }
+      },
+      "operations": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true
+      },
+      "validation": {
+        "enabled": true,
+        "strictMode": false
+      },
+      "cache": {
+        "enabled": true,
+        "ttl": 300
+      }
+    },
+    "USUARIOS": {
+      "name": "USUARIOS",
+      "tableName": "USUARIOS",
+      "displayName": "Usuarios del Sistema",
+      "description": "Tabla de usuarios del sistema",
+      "primaryKey": "ID_USUARIO",
+      "defaultConnection": "default",
+      "allowedConnections": ["default", "prod"],
+      "fields": {
+        "ID_USUARIO": {
+          "type": "NUMBER",
+          "required": true,
+          "primaryKey": true,
+          "autoIncrement": true
+        },
+        "NOMBRE": {
+          "type": "VARCHAR2",
+          "length": 100,
+          "required": true
+        },
+        "EMAIL": {
+          "type": "VARCHAR2",
+          "length": 200,
+          "required": false
         }
       },
       "operations": {

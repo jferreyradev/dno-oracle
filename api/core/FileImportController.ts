@@ -135,14 +135,23 @@ export class FileImportController {
         return;
       }
 
-      console.log(`Obteniendo columnas de tabla: ${tableName}`);
+      // Extraer conexión de query params, headers o usar default
+      const connectionName = ctx.request.url.searchParams.get('connection') ||
+                           ctx.request.headers.get('x-connection') ||
+                           'default';
 
-      const columns = await FileImportService.getTableColumns(tableName);
+      console.log(`Obteniendo columnas de tabla: ${tableName} con conexión: ${connectionName}`);
+
+      const columns = await FileImportService.getTableColumns(tableName, connectionName);
 
       ctx.response.body = {
         success: true,
         data: columns,
-        message: `Columnas obtenidas para tabla ${tableName}`
+        message: `Columnas obtenidas para tabla ${tableName}`,
+        meta: {
+          connectionUsed: connectionName,
+          tableName: tableName
+        }
       };
 
     } catch (error) {

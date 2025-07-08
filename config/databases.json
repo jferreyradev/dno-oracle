@@ -1,0 +1,22 @@
+[
+  {
+    "name": "prod",
+    "user": "WORKFLOW",
+    "password": "workflow",
+    "connectString": "10.6.177.180:1521/HPROD04",
+    "poolMax": 10,
+    "poolMin": 2,
+    "description": "🏢 Conexión principal WORKFLOW - Producción",
+    "schema": "WORKFLOW"
+  },
+  {
+    "name": "desa",
+    "user": "USUARIO",
+    "password": "usuario",
+    "connectString": "10.6.46.17:1521/HTEST01",
+    "poolMax": 8,
+    "poolMin": 2,
+    "description": "🛠️ Base de datos de desarrollo - SERVIDOR DIFERENTE",
+    "schema": "WORKFLOW"
+  }
+]

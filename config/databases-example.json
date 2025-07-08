@@ -1,0 +1,42 @@
+[
+  {
+    "name": "produccion",
+    "user": "app_user",
+    "password": "prod_password",
+    "connectString": "prod-oracle.empresa.com:1521/PROD",
+    "poolMax": 20,
+    "poolMin": 5,
+    "description": "Base de datos de producción",
+    "schema": "APP_SCHEMA"
+  },
+  {
+    "name": "desarrollo",
+    "user": "dev_user", 
+    "password": "dev_password",
+    "connectString": "dev-oracle.empresa.com:1521/DEV",
+    "poolMax": 10,
+    "poolMin": 2,
+    "description": "Base de datos de desarrollo",
+    "schema": "DEV_SCHEMA"
+  },
+  {
+    "name": "reportes",
+    "user": "report_user",
+    "password": "report_password", 
+    "connectString": "reports-oracle.empresa.com:1521/REPORTS",
+    "poolMax": 15,
+    "poolMin": 3,
+    "description": "Base de datos de reportes y BI",
+    "schema": "REPORTS_SCHEMA"
+  },
+  {
+    "name": "testing",
+    "user": "test_user",
+    "password": "test_password",
+    "connectString": "localhost:1521/XE",
+    "poolMax": 5,
+    "poolMin": 1,
+    "description": "Base de datos para pruebas locales",
+    "schema": "TEST_SCHEMA"
+  }
+]

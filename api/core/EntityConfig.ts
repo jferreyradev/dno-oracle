@@ -217,6 +217,28 @@ class EntityConfigManager {
       .filter(([_, fieldConfig]) => fieldConfig.required === true && !fieldConfig.autoIncrement)
       .map(([fieldName, _]) => fieldName);
   }
+
+  /**
+   * Guarda la configuración en el archivo JSON
+   */
+  async saveConfig(config: AppConfig): Promise<void> {
+    try {
+      // Validar la configuración antes de guardar
+      this.config = config;
+      this.validateConfig();
+      
+      // Convertir a JSON con formato bonito
+      const configJson = JSON.stringify(config, null, 2);
+      
+      // Guardar archivo
+      await Deno.writeTextFile(this.configPath, configJson);
+      
+      console.log(`✅ Configuración guardada en ${this.configPath}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      throw new Error(`Error guardando configuración: ${errorMessage}`);
+    }
+  }
 }
 
 // Instancia singleton

@@ -1,0 +1,36 @@
+{
+  "connection": "prod",
+  "entities": {
+    "USUARIOS": {
+      "name": "USUARIOS",
+      "tableName": "USUARIOS",
+      "displayName": "Usuarios del Sistema",
+      "description": "Tabla de usuarios del sistema",
+      "primaryKey": "ID_USUARIO",
+      "fields": {
+        "ID_USUARIO": {
+          "type": "NUMBER",
+          "required": true,
+          "primaryKey": true,
+          "autoIncrement": true
+        },
+        "NOMBRE": {
+          "type": "VARCHAR2",
+          "length": 100,
+          "required": true
+        },
+        "EMAIL": {
+          "type": "VARCHAR2",
+          "length": 200,
+          "required": false
+        }
+      },
+      "operations": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "delete": true
+      }
+    }
+  }
+}

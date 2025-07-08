@@ -150,20 +150,26 @@ export class FileImportService {
       };
     }
   }
-  
-  /**
+    /**
    * Obtiene la configuración de una tabla desde entities.json
    */
-  private static async getTableConfiguration(tableName: string): Promise<ImportColumn[]> {
+  private static async getTableConfiguration(tableName: string, connectionName: string = 'default'): Promise<ImportColumn[]> {
     const config = await entityConfig.loadConfig();
     
+    // Buscar la entidad por nombre de tabla en la conexión especificada
+    const entities = config.connections?.[connectionName]?.entities || config.entities;
+    
+    if (!entities) {
+      throw new Error(`No se encontraron entidades para la conexión ${connectionName}`);
+    }
+    
     // Buscar la entidad por nombre de tabla
-    const entity = Object.values(config.entities).find(
+    const entity = Object.values(entities).find(
       (entity) => entity.tableName === tableName
     );
     
     if (!entity) {
-      throw new Error(`Tabla ${tableName} no encontrada en la configuración`);
+      throw new Error(`Tabla ${tableName} no encontrada en la configuración para la conexión ${connectionName}`);
     }
     
     // Convertir campos a columnas de importación
@@ -178,7 +184,7 @@ export class FileImportService {
         defaultValue: fieldConfig.default
       });
     }
-    
+
     return columns;
   }
   
@@ -486,8 +492,8 @@ export class FileImportService {
   /**
    * Obtiene las columnas disponibles de una tabla
    */
-  static getTableColumns(tableName: string): Promise<ImportColumn[]> {
-    return this.getTableConfiguration(tableName);
+  static getTableColumns(tableName: string, connectionName: string = 'default'): Promise<ImportColumn[]> {
+    return this.getTableConfiguration(tableName, connectionName);
   }
   
   /**
@@ -495,9 +501,10 @@ export class FileImportService {
    */
   static async generateAutoMapping(
     csvHeaders: string[],
-    tableName: string
+    tableName: string,
+    connectionName: string = 'default'
   ): Promise<ImportMapping[]> {
-    const tableColumns = await this.getTableConfiguration(tableName);
+    const tableColumns = await this.getTableConfiguration(tableName, connectionName);
     const mappings: ImportMapping[] = [];
     
     for (let i = 0; i < csvHeaders.length; i++) {

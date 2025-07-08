@@ -15,6 +15,18 @@
                 <h1>🗄️ DNO-Oracle</h1>
                 <p>Sistema de Gestión de Datos Oracle</p>
             </div>
+            <div class="header-controls">
+                <!-- Connection Selector -->
+                <div class="connection-selector">
+                    <label for="connection-select">🔗 Conexión:</label>
+                    <select id="connection-select" class="connection-dropdown">
+                        <option value="">Cargando...</option>
+                    </select>
+                    <button id="refresh-connections-btn" class="btn btn-sm btn-outline" title="Actualizar conexiones">
+                        🔄
+                    </button>
+                </div>
+            </div>
             <div class="header-actions">
                 <button id="health-check-btn" class="btn btn-outline">
                     <span class="btn-icon">💚</span>
@@ -36,6 +48,10 @@
             <button class="nav-btn" data-tab="tables">
                 <span class="nav-icon">🗂️</span>
                 Gestionar Tablas
+            </button>
+            <button class="nav-btn" data-tab="entities">
+                <span class="nav-icon">🏗️</span>
+                Entidades
             </button>
             <button class="nav-btn" data-tab="queries">
                 <span class="nav-icon">🔍</span>
@@ -178,6 +194,156 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Table Details Section -->
+                <div class="card" id="table-details-card" style="display: none;">
+                    <div class="card-header">
+                        <h2 id="table-details-title">📊 Detalles de Tabla</h2>
+                        <div class="card-actions">
+                            <button class="btn btn-outline" id="close-table-details-btn">
+                                <span class="btn-icon">❌</span>
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-details-content" id="table-details-content">
+                            <!-- Table details will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entities Tab -->
+            <div id="entities-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🏗️ Gestión de Entidades</h2>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" id="create-entity-btn">
+                                <span class="btn-icon">➕</span>
+                                Nueva Entidad
+                            </button>
+                            <button class="btn btn-secondary" id="generate-entity-btn">
+                                <span class="btn-icon">🔧</span>
+                                Generar desde Tabla
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="entities-container">
+                            <!-- JSON Editor for new entity -->
+                            <div class="entity-editor" id="entity-editor" style="display: none;">
+                                <h3>📝 Editor de Entidad</h3>
+                                <div class="form-group">
+                                    <label for="entity-connection">Conexión:</label>
+                                    <select id="entity-connection" class="form-control">
+                                        <option value="default">Default</option>
+                                        <option value="desa">Desarrollo</option>
+                                        <option value="prod">Producción</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="entity-table-select">Tabla disponible:</label>
+                                    <select id="entity-table-select" class="form-control">
+                                        <option value="">Selecciona una tabla...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="entity-json">Configuración JSON:</label>
+                                    <textarea id="entity-json" class="form-control code-editor" rows="20" placeholder="Ingresa la configuración JSON de la entidad..."></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn btn-primary" id="save-entity-btn">
+                                        <span class="btn-icon">💾</span>
+                                        Guardar Entidad
+                                    </button>
+                                    <button class="btn btn-outline" id="cancel-entity-btn">
+                                        <span class="btn-icon">❌</span>
+                                        Cancelar
+                                    </button>
+                                    <button class="btn btn-outline" id="validate-entity-btn">
+                                        <span class="btn-icon">✅</span>
+                                        Validar JSON
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Modal para generación automática de entidades -->
+                            <div class="entity-generator" id="entity-generator" style="display: none;">
+                                <h3>🔧 Generar Entidad desde Tabla</h3>
+                                <p class="help-text">Selecciona una tabla física para generar automáticamente su entidad correspondiente.</p>
+                                
+                                <div class="form-group">
+                                    <label for="generator-connection">Conexión:</label>
+                                    <select id="generator-connection" class="form-control">
+                                        <option value="default">Default</option>
+                                        <option value="desa">Desarrollo</option>
+                                        <option value="prod">Producción</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="generator-table-select">Tabla física:</label>
+                                    <select id="generator-table-select" class="form-control">
+                                        <option value="">Cargando tablas...</option>
+                                    </select>
+                                    <button type="button" class="btn btn-sm btn-outline" id="refresh-generator-tables-btn" style="margin-top: 5px;">
+                                        🔄 Actualizar Tablas
+                                    </button>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="generator-entity-name">Nombre de la entidad (opcional):</label>
+                                    <input type="text" id="generator-entity-name" class="form-control" placeholder="Se usará el nombre de la tabla en minúsculas">
+                                    <small class="help-text">Si se deja vacío, se usará el nombre de la tabla convertido a minúsculas.</small>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button class="btn btn-primary" id="generate-entity-action-btn">
+                                        <span class="btn-icon">🔧</span>
+                                        Generar Entidad
+                                    </button>
+                                    <button class="btn btn-outline" id="cancel-generator-btn">
+                                        <span class="btn-icon">❌</span>
+                                        Cancelar
+                                    </button>
+                                    <button class="btn btn-secondary" id="preview-entity-btn" style="display: none;">
+                                        <span class="btn-icon">👁️</span>
+                                        Ver Vista Previa
+                                    </button>
+                                </div>
+                                
+                                <!-- Vista previa de la entidad generada -->
+                                <div class="entity-preview" id="entity-preview" style="display: none;">
+                                    <h4>👁️ Vista Previa de la Entidad</h4>
+                                    <div class="form-group">
+                                        <label>JSON Generado:</label>
+                                        <textarea id="entity-preview-json" class="form-control code-editor" rows="15" readonly></textarea>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button class="btn btn-primary" id="save-generated-entity-btn">
+                                            <span class="btn-icon">💾</span>
+                                            Guardar Entidad Generada
+                                        </button>
+                                        <button class="btn btn-outline" id="edit-generated-entity-btn">
+                                            <span class="btn-icon">✏️</span>
+                                            Editar Manualmente
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Current entities display -->
+                            <div class="entities-list" id="entities-list">
+                                <h3>📋 Entidades Actuales</h3>
+                                <div class="entities-grid" id="entities-grid">
+                                    <!-- Entities will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Queries Tab -->
@@ -185,6 +351,9 @@
                 <div class="card">
                     <div class="card-header">
                         <h2>🔍 Consultas SQL</h2>
+                        <div class="connection-info" id="query-connection-info">
+                            <span class="connection-badge">🔗 Conexión: <span id="current-connection-display">-</span></span>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="query-editor">
