@@ -55,10 +55,9 @@ Write-ColorText "📁 Verificando archivos del proyecto..." "Blue"
 
 $requiredFiles = @(
     "config/entities.json",
-    "api/server-enhanced.ts",
-    "public/index.html",
-    "public/app.js",
-    "docs/API-DOCUMENTATION.md"
+    "api/server-minimal.ts",
+    "config/databases.json",
+    ".env.example"
 )
 
 foreach ($file in $requiredFiles) {
@@ -132,8 +131,8 @@ if (Test-Path $envFile) {
     Write-ColorText "✅ Archivo .env encontrado" "Green"
     
     $envContent = Get-Content $envFile
-    $requiredVars = @("USER", "PASSWORD", "CONNECTIONSTRING")
-    $optionalVars = @("PORT", "API_ONLY", "LIB_ORA")
+    $requiredVars = @("DB_USER", "DB_PASSWORD", "DB_HOST", "DB_SERVICE")
+    $optionalVars = @("PORT", "LIB_ORA", "DB_PORT", "DB_SCHEMA")
     
     foreach ($var in $requiredVars) {
         $found = $envContent | Where-Object { $_ -match "^$var\s*=" }
@@ -164,7 +163,7 @@ if (-not $SkipVerification) {
     Write-ColorText "🔎 Verificando código TypeScript..." "Blue"
     
     try {
-        $tsCheck = deno check api/server-enhanced.ts 2>&1
+        $tsCheck = deno check api/server-minimal.ts 2>&1
         if ($LASTEXITCODE -eq 0) {
             Write-ColorText "✅ Código TypeScript válido" "Green"
         } else {
@@ -230,9 +229,11 @@ if (-not $VerifyOnly) {
     Write-Host "   Modo: $Mode"
     Write-Host ""
     Write-ColorText "📋 Endpoints disponibles:" "Blue"
-    Write-Host "   • http://localhost:$Port - Interfaz web"
-    Write-Host "   • http://localhost:$Port/api/info - Documentación API"
     Write-Host "   • http://localhost:$Port/api/health - Estado del sistema"
+    Write-Host "   • http://localhost:$Port/api/info - Información de la API"
+    Write-Host "   • http://localhost:$Port/api/connections - Estado de conexiones"
+    Write-Host "   • http://localhost:$Port/api/entities - Lista de entidades"
+    Write-Host "   • http://localhost:$Port/api/{entidad} - Operaciones CRUD"
     Write-Host ""
     Write-ColorText "   Presiona Ctrl+C para detener el servidor" "Yellow"
     Write-Host ""
@@ -242,12 +243,7 @@ if (-not $VerifyOnly) {
     
     # Ejecutar servidor
     try {
-        if ($Mode -eq "api-only") {
-            $env:API_ONLY = "true"
-            deno run --allow-all api/server-api-only.ts
-        } else {
-            deno run --allow-all api/server-enhanced.ts
-        }
+        deno run --allow-net --allow-read --allow-env --allow-ffi api/server-minimal.ts
     } catch {
         Write-ColorText "❌ Error ejecutando servidor: $($_.Exception.Message)" "Red"
     }
