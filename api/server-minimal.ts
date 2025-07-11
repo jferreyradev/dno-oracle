@@ -9,6 +9,8 @@ import { Application, Router } from 'https://deno.land/x/oak@v12.6.1/mod.ts';
 import { oakCors } from 'https://deno.land/x/cors@v1.2.2/mod.ts';
 import { MultiDatabaseService } from './core/MultiDatabaseService.ts';
 import { entityConfig } from './core/EntityConfig.ts';
+import { FileImportRouter } from './core/FileImportRouter.ts';
+import { FileImportServiceSimple } from './core/FileImportServiceSimple.ts';
 
 // Función auxiliar para obtener el siguiente ID auto-incremental
 async function getNextAutoIncrementId(entity: any, connectionName: string): Promise<number> {
@@ -34,6 +36,29 @@ app.use(oakCors({
   origin: "*",
   credentials: true,
 }));
+
+// Servir archivos estáticos desde /public
+app.use(async (ctx, next) => {
+  if (ctx.request.url.pathname.startsWith('/public/')) {
+    try {
+      const filePath = `${Deno.cwd()}/${ctx.request.url.pathname}`;
+      const file = await Deno.readFile(filePath);
+      
+      // Determinar Content-Type
+      let contentType = 'text/plain';
+      if (filePath.endsWith('.html')) contentType = 'text/html';
+      else if (filePath.endsWith('.css')) contentType = 'text/css';
+      else if (filePath.endsWith('.js')) contentType = 'application/javascript';
+      
+      ctx.response.headers.set('Content-Type', contentType);
+      ctx.response.body = file;
+    } catch {
+      await next();
+    }
+  } else {
+    await next();
+  }
+});
 
 // Middleware para parsing de JSON
 app.use(async (ctx, next) => {
@@ -82,8 +107,8 @@ router.get('/api/info', (ctx) => {
     data: {
       name: 'DNO-Oracle API',
       version: '1.0.0',
-      mode: 'minimal',
-      description: 'API REST genérica para Oracle Database',
+      mode: 'complete',
+      description: 'API REST genérica para Oracle Database con importación de archivos',
       endpoints: [
         'GET /api/health',
         'GET /api/info',
@@ -96,7 +121,13 @@ router.get('/api/info', (ctx) => {
         'DELETE /api/{entidad}/{id}',
         'POST /api/{entidad}/batch',
         'POST /api/procedures/{procedureName}',
-        'POST /api/functions/{functionName}'
+        'POST /api/functions/{functionName}',
+        'POST /api/import/csv',
+        'POST /api/import/validate',
+        'POST /api/import/headers',
+        'POST /api/import/mapping',
+        'GET /api/import/info',
+        'GET /api/import/columns/{tableName}'
       ],
       features: {
         multiConnectionSupport: true,
@@ -105,7 +136,11 @@ router.get('/api/info', (ctx) => {
         crudOperations: true,
         batchOperations: true,
         storedProcedures: true,
-        storedFunctions: true
+        storedFunctions: true,
+        fileImport: true,
+        csvImport: true,
+        dataValidation: true,
+        autoMapping: true
       }
     }
   };
@@ -941,9 +976,14 @@ router.post('/api/:entity/batch', async (ctx) => {
   }
 });
 
-// Registrar rutas
+// Registrar rutas principales
 app.use(router.routes());
 app.use(router.allowedMethods());
+
+// Registrar rutas de importación de archivos
+const fileImportRouter = FileImportRouter.getRouter();
+app.use(fileImportRouter.routes());
+app.use(fileImportRouter.allowedMethods());
 
 // Manejar errores
 app.addEventListener('error', (evt) => {
@@ -959,6 +999,10 @@ try {
   await multiDbService.initialize();
   console.log('✅ MultiDatabaseService inicializado');
   
+  // Inicializar servicio de importación de archivos
+  FileImportServiceSimple.setDatabaseService(multiDbService);
+  console.log('✅ FileImportService inicializado');
+  
   // Verificar configuración de entidades
   const entityNames = await entityConfig.getEntityNames();
   console.log(`✅ ${entityNames.length} entidades configuradas`);
@@ -971,7 +1015,7 @@ try {
 // Configurar puerto
 const port = parseInt(Deno.env.get('PORT') || '8000');
 
-console.log('🚀 Iniciando DNO-Oracle API (Servidor Completo)...');
+console.log('🚀 Iniciando DNO-Oracle API (Servidor Completo con Importación)...');
 console.log(`📡 Servidor ejecutándose en: http://localhost:${port}`);
 console.log('📋 Endpoints disponibles:');
 console.log(`   GET    http://localhost:${port}/api/health`);
@@ -986,5 +1030,12 @@ console.log(`   DELETE http://localhost:${port}/api/{entidad}/{id}`);
 console.log(`   POST   http://localhost:${port}/api/{entidad}/batch`);
 console.log(`   POST   http://localhost:${port}/api/procedures/{nombre}`);
 console.log(`   POST   http://localhost:${port}/api/functions/{nombre}`);
+console.log('📂 Endpoints de importación:');
+console.log(`   POST   http://localhost:${port}/api/import/csv`);
+console.log(`   POST   http://localhost:${port}/api/import/validate`);
+console.log(`   POST   http://localhost:${port}/api/import/headers`);
+console.log(`   POST   http://localhost:${port}/api/import/mapping`);
+console.log(`   GET    http://localhost:${port}/api/import/info`);
+console.log(`   GET    http://localhost:${port}/api/import/columns/{tabla}`);
 
 await app.listen({ port });

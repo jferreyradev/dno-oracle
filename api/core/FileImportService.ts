@@ -2,7 +2,7 @@
  * Servicio para importar archivos CSV/Excel a tablas Oracle
  */
 
-import * as db from './DatabaseService.ts';
+import { MultiDatabaseService } from './MultiDatabaseService.ts';
 import { entityConfig } from './EntityConfig.ts';
 
 // Interfaces para los tipos de datos
